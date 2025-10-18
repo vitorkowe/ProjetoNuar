@@ -120,13 +120,35 @@
         </div>
     </div>
 
+    <!-- Funções globais FORA do módulo -->
+    <script>
+        function showRegister(e) {
+            e.preventDefault();
+            const loginError = document.getElementById('loginError');
+            const loginPage = document.getElementById('loginPage');
+            const registerPage = document.getElementById('registerPage');
+            loginError.classList.remove('show');
+            loginPage.classList.add('hidden');
+            registerPage.classList.remove('hidden');
+        }
+
+        function showLogin(e) {
+            e.preventDefault();
+            const registerError = document.getElementById('registerError');
+            const loginPage = document.getElementById('loginPage');
+            const registerPage = document.getElementById('registerPage');
+            registerError.classList.remove('show');
+            registerPage.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+        }
+    </script>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // COLE AQUI SUA CONFIGURAÇÃO DO FIREBASE (do código que apareceu)
         const firebaseConfig = {
             apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBp-yiQrKJIKRD9k",
             authDomain: "nuarkowe.firebaseapp.com",
@@ -152,8 +174,6 @@
         }
 
         function hideError(el) { el.classList.remove('show'); }
-        function showRegister(e) { e.preventDefault(); hideError(loginError); loginPage.classList.add('hidden'); registerPage.classList.remove('hidden'); }
-        function showLogin(e) { e.preventDefault(); hideError(registerError); registerPage.classList.add('hidden'); loginPage.classList.remove('hidden'); }
 
         function showConfirm(msg) {
             return new Promise((resolve) => {
@@ -200,7 +220,6 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Salvar dados no Firestore
                 await addDoc(collection(db, 'users'), {
                     uid: user.uid,
                     username: username,
@@ -239,7 +258,6 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Buscar dados do usuário no Firestore
                 const q = query(collection(db, 'users'), where('uid', '==', user.uid));
                 const querySnapshot = await getDocs(q);
                 
