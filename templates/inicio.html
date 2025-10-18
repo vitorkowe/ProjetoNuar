@@ -2280,7 +2280,7 @@ body {
             <form id="adminLoginForm">
                 <div class="admin-input-group">
                     <label>Email Admin</label>
-                    <input type="email" id="adminEmail" class="admin-input" placeholder="admin@nuar.com" required>
+                    <input type="email" id="adminEmail" class="admin-input" placeholder="kowe@gmail.com" required>
                 </div>
                 <div class="admin-input-group">
                     <label>Senha Admin</label>
@@ -3432,7 +3432,7 @@ window.showSeason = function(season, itemId) {
 
         function renderMovies() {
             const adminUser = auth.currentUser;
-            const isAdmin = adminUser && adminUser.email === 'admin@nuar.com';
+            const isAdmin = adminUser && adminUser.email === 'kowe@gmail.com';
             
             const moviesGrid = document.getElementById('moviesGrid');
             const seriesGrid = document.getElementById('seriesGrid');
@@ -3574,7 +3574,7 @@ window.showSeason = function(season, itemId) {
 
         function createMovieCard(m, type) {
             const adminUser = auth.currentUser;
-            const isAdmin = adminUser && adminUser.email === 'admin@nuar.com';
+            const isAdmin = adminUser && adminUser.email === 'kowe@gmail.com';
             const genresText = m.genres.join(' • ');
             const itemId = m.firebaseKey || m.id;
             
@@ -3635,7 +3635,7 @@ window.showSeason = function(season, itemId) {
 
         function createMovieCardWithProgress(m, type, progress) {
             const adminUser = auth.currentUser;
-            const isAdmin = adminUser && adminUser.email === 'admin@nuar.com';
+            const isAdmin = adminUser && adminUser.email === 'kowe@gmail.com';
             const genresText = m.genres.join(' • ');
             const itemId = m.firebaseKey || m.id;
             
@@ -3879,7 +3879,7 @@ window.showSeason = function(season, itemId) {
 
             floatBtn.addEventListener('click', () => {
                 const adminUser = auth.currentUser;
-                if (adminUser && adminUser.email === 'admin@nuar.com') {
+                if (adminUser && adminUser.email === 'kowe@gmail.com') {
                     toggleDurationField();
                     contentModal.classList.add('active');
                 } else {
@@ -3901,7 +3901,7 @@ window.showSeason = function(season, itemId) {
                 try {
                     const userCredential = await auth.signInWithEmailAndPassword(email, password);
                     
-                    if (userCredential.user.email === 'admin@nuar.com') {
+                    if (userCredential.user.email === 'kowe@gmail.com') {
                         console.log('✅ Admin autenticado:', userCredential.user.email);
                         loginModal.classList.remove('active');
                         contentModal.classList.add('active');
