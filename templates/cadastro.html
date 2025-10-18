@@ -108,7 +108,83 @@
 
     <!-- Carregar Firebase de forma sequencial -->
     <script>
+        // Proteção contra loop de reload
+        const LOAD_KEY = 'nuar_loading_attempt';
+        const MAX_RETRIES = 3;
+        const RETRY_TIMEOUT = 5000; // 5 segundos
+        
+        // Verificar tentativas de carregamento
+        function checkLoadLoop() {
+            const now = Date.now();
+            const lastAttempt = localStorage.getItem(LOAD_KEY);
+            
+            if (lastAttempt) {
+                const attempts = JSON.parse(lastAttempt);
+                const timeDiff = now - attempts.timestamp;
+                
+                // Se última tentativa foi há menos de 5 segundos
+                if (timeDiff < RETRY_TIMEOUT) {
+                    if (attempts.count >= MAX_RETRIES) {
+                        console.error('❌ Loop detectado! Parando recarregamentos.');
+                        document.getElementById('loadingOverlay').innerHTML = `
+                            <div style="text-align: center; padding: 40px;">
+                                <h2 style="color: #f87171; margin-bottom: 20px;">⚠️ Loop Detectado</h2>
+                                <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
+                                    A página está tentando recarregar continuamente.<br>
+                                    Isso pode ser um problema de configuração.
+                                </p>
+                                <button onclick="localStorage.removeItem('${LOAD_KEY}'); location.reload()" style="
+                                    padding: 12px 24px;
+                                    background: #5c45af;
+                                    border: none;
+                                    border-radius: 8px;
+                                    color: white;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                    margin: 5px;
+                                ">Resetar e Tentar Novamente</button>
+                            </div>
+                        `;
+                        return false;
+                    }
+                    // Incrementar contador
+                    localStorage.setItem(LOAD_KEY, JSON.stringify({
+                        count: attempts.count + 1,
+                        timestamp: now
+                    }));
+                } else {
+                    // Resetar se passou tempo suficiente
+                    localStorage.setItem(LOAD_KEY, JSON.stringify({
+                        count: 1,
+                        timestamp: now
+                    }));
+                }
+            } else {
+                // Primeira tentativa
+                localStorage.setItem(LOAD_KEY, JSON.stringify({
+                    count: 1,
+                    timestamp: now
+                }));
+            }
+            
+            return true;
+        }
+        
+        // Limpar flag após carregamento bem-sucedido
+        function clearLoadFlag() {
+            setTimeout(() => {
+                localStorage.removeItem(LOAD_KEY);
+                console.log('✅ Flag de carregamento limpa');
+            }, 2000);
+        }
+        
         console.log('🚀 Iniciando carregamento do Firebase...');
+        
+        // Verificar loop antes de continuar
+        if (!checkLoadLoop()) {
+            console.error('❌ Carregamento bloqueado por proteção de loop');
+            throw new Error('Loop detectado');
+        }
         
         // Atualizar status
         function updateLoadingStatus(message, type = 'warning') {
@@ -220,6 +296,9 @@
                 console.log('✅ Firebase inicializado:', window.app.name);
                 updateLoadingStatus('Sistema pronto!', 'success');
                 
+                // Limpar flag de carregamento (sucesso!)
+                clearLoadFlag();
+                
                 // Esconder loading e mostrar formulário
                 setTimeout(() => {
                     document.getElementById('loadingOverlay').classList.add('hidden');
@@ -264,10 +343,11 @@
                 });
             });
             
-            // Auth state (só uma vez)
+            // Auth state (só uma vez) - SEM REDIRECIONAMENTO AUTOMÁTICO
             window.auth.onAuthStateChanged((user) => {
                 if (user) {
                     console.log('👤 Usuário logado:', user.email);
+                    // NÃO redirecionar automaticamente - só mostrar no console
                 }
             });
             
