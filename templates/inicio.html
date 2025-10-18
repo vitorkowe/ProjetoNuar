@@ -1657,45 +1657,22 @@
 
         // ===== PASSO 4: ATUALIZAR saveAvatarToFirebase =====
         async function saveAvatarToFirebase(avatarBase64) {
-            const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return false;
+    loggedUser.avatar = avatarBase64;
+    localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
+    return true;
+}
 
-            if (!loggedUser) {
-                console.error('❌ Nenhum usuário logado');
-                return false;
-            }
-
-            const firebaseUser = auth.currentUser;
-            
-            if (!firebaseUser) {
-                console.warn('⚠️ Usuário não autenticado no Firebase Auth');
-                console.log('💾 Salvando avatar apenas no localStorage');
-                
-                loggedUser.avatar = avatarBase64;
-                localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
-                return true;
-            }
-
-            try {
-                console.log('💾 Usuário autenticado! Salvando no Firebase...');
-                console.log('👤 UID:', firebaseUser.uid);
-                
-                await database.ref(`users/${firebaseUser.uid}`).update({
-                    avatar: avatarBase64
-                });
-                
-                console.log('✅ Avatar salvo no Firebase Database');
-                
-                loggedUser.avatar = avatarBase64;
-                loggedUser.uid = firebaseUser.uid;
-                localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
-                
-                console.log('✅ LocalStorage atualizado');
-                return true;
-                
-            } catch (error) {
-                console.error('Erro ao carregar dados do Firebase:', error);
-            }
-        }
+async function loadUserDataFromFirebase() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser || !loggedUser.avatar) return;
+    const avatar = document.getElementById('userAvatar');
+    if (avatar) {
+        avatar.style.backgroundImage = `url(${loggedUser.avatar})`;
+        avatar.textContent = '';
+    }
+}
 
         function loadContentFromFirebase() {
             console.log('Carregando conteúdo do Firebase...');
