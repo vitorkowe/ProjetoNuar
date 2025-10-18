@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Séries - Nuar</title>
+    
+    <!-- Firebase SDK - COLOCAR NO HEAD -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -330,6 +335,13 @@
             margin-bottom: 20px;
             opacity: 0.3;
         }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -341,35 +353,17 @@
         }
     </script>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBp-yiQrKJIKRD9k",
-            authDomain: "nuarkowe.firebaseapp.com",
-            projectId: "nuarkowe",
-            storageBucket: "nuarkowe.firebasestorage.app",
-            messagingSenderId: "1063041816951",
-            appId: "1:1063041816951:web:0ffe4185fd0102b878e972"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-    </script>
-
-    <!-- Resto do HTML aqui -->
-</body>
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                <div class="logo" onclick="window.location.href='/'">
+                <div class="logo" onclick="window.location.href='/inicio.html'">
                     <img src="https://i.ibb.co/DDyKRKY6/nuarrr.png" alt="Nuar">
                 </div>
                 <div class="nav-tabs">
-                    <a href="inicio" class="nav-tab">Início</a>
-                    <a href="filmes" class="nav-tab">Filmes</a>
-                    <a href="series" class="nav-tab active">Séries</a>
-                    <a href="animes" class="nav-tab">Animes</a>
+                    <a href="/inicio.html" class="nav-tab">Início</a>
+                    <a href="/filmes.html" class="nav-tab">Filmes</a>
+                    <a href="/series.html" class="nav-tab active">Séries</a>
+                    <a href="/animes.html" class="nav-tab">Animes</a>
                 </div>
             </div>
             
@@ -382,7 +376,9 @@
 
     <div class="container">
         <h1 class="page-title">Séries</h1>
-        <div class="movies-grid" id="moviesGrid"></div>
+        <div class="movies-grid" id="moviesGrid">
+            <div class="loading">Carregando séries...</div>
+        </div>
     </div>
 
     <div class="modal" id="modal" onclick="if(event.target.id==='modal') closeModal()">
@@ -396,41 +392,39 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // Inicializar Firebase (APENAS UMA VEZ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhlEtmKXGeAsY9Ih-BBP-y1GrKJIKRD9k",
+            authDomain: "nuarkowe.firebaseapp.com",
+            databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
+            projectId: "nuarkowe",
+            storageBucket: "nuarkowe.firebasestorage.app",
+            messagingSenderId: "106304181695",
+            appId: "1:106304181695:web:8ffe4185fd8102b878e972"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         let userFavorites = new Set();
         let series = [];
 
-        // Carrega séries do localStorage
+        // Carrega séries do Firebase (TEMPO REAL)
         function loadSeries() {
-            const saved = localStorage.getItem('nuarContent');
-            if (saved) {
-                const content = JSON.parse(saved);
-                series = content.series || [];
-            } else {
-                // Conteúdo padrão caso não exista no localStorage
-                series = [
-                    {id: 101, title: "Breaking Bad", year: 2008, rating: 9.5, duration: "5 temporadas", genres: ["Drama", "Crime"], description: "Um professor diagnosticado com câncer se junta a um ex-aluno para produzir metanfetamina.", imageUrl: "https://img.elo7.com.br/product/685x685/26A857B/big-poster-serie-breaking-bad-lo02-tamanho-90x60-cm-poster.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt0903747"},
-                    {id: 102, title: "Stranger Things", year: 2016, rating: 8.7, duration: "4 temporadas", genres: ["Ficção científica", "Terror"], description: "Quando um garoto desaparece, sua mãe e amigos enfrentam forças aterrorizantes.", imageUrl: "https://i.pinimg.com/1200x/00/ea/7c/00ea7c88e9e80f8bea6d13f3f7f0a810.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt4574334"},
-                    {id: 103, title: "Dexter", year: 2006, rating: 8.8, duration: "8 temporadas", genres: ["Crime", "Suspense", "Ação"], description: "Dexter é um especialista forense que passa o dia solucionando crimes e a noite cometendo assassinatos.", imageUrl: "https://br.web.img2.acsta.net/pictures/210/032/21003280_20130504002100017.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt0773262"}
-                ];
-            }
-            console.log('Séries carregadas:', series.length);
-        }
-
-        // Escuta mudanças no localStorage (quando admin adiciona/edita/remove)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'nuarContent') {
-                console.log('Conteúdo atualizado! Recarregando séries...');
-                loadSeries();
+            console.log('Configurando listener do Firebase para séries...');
+            
+            database.ref('content/series').on('value', (snapshot) => {
+                const data = snapshot.val();
+                series = data ? Object.keys(data).map(key => ({
+                    ...data[key],
+                    firebaseKey: key,
+                    id: data[key].id || key
+                })) : [];
+                
+                console.log('Séries atualizadas do Firebase:', series.length);
                 renderMovies();
-            }
-        });
-
-        // Escuta evento customizado da mesma aba
-        window.addEventListener('nuarContentUpdated', () => {
-            console.log('Conteúdo atualizado na mesma aba! Recarregando séries...');
-            loadSeries();
-            renderMovies();
-        });
+            });
+        }
 
         async function checkAuth() {
             const loggedUser = localStorage.getItem('nuarLoggedUser');
@@ -462,7 +456,7 @@
 
         function updateFavoriteButtons() {
             document.querySelectorAll('.favorite-btn').forEach(btn => {
-                const itemId = parseInt(btn.dataset.id);
+                const itemId = btn.dataset.id;
                 if (userFavorites.has(itemId)) {
                     btn.classList.add('favorited');
                 } else {
@@ -481,7 +475,7 @@
                 return;
             }
 
-            const item = series.find(m => m.id === itemId);
+            const item = series.find(m => (m.firebaseKey || m.id) == itemId);
             if (!item) return;
 
             const btn = event.currentTarget;
@@ -536,31 +530,34 @@
                 return;
             }
 
-            grid.innerHTML = moviesToRender.map(m => `
-                <div class="movie-card" onclick="openModal(${m.id})">
-                    <div class="movie-poster">
-                        <img src="${m.imageUrl}" alt="${m.title}">
-                        <button class="favorite-btn ${userFavorites.has(m.id) ? 'favorited' : ''}" 
-                                data-id="${m.id}" 
-                                onclick="toggleFavorite(event, ${m.id})">
-                            <svg viewBox="0 0 24 24" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-title">${m.title}</div>
-                        <div class="movie-meta">
-                            <span class="rating">⭐ ${m.rating}</span>
-                            <span>${m.year}</span>
+            grid.innerHTML = moviesToRender.map(m => {
+                const itemId = m.firebaseKey || m.id;
+                return `
+                    <div class="movie-card" onclick="openModal('${itemId}')">
+                        <div class="movie-poster">
+                            <img src="${m.imageUrl}" alt="${m.title}">
+                            <button class="favorite-btn ${userFavorites.has(itemId) ? 'favorited' : ''}" 
+                                    data-id="${itemId}" 
+                                    onclick="toggleFavorite(event, '${itemId}')">
+                                <svg viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="movie-info">
+                            <div class="movie-title">${m.title}</div>
+                            <div class="movie-meta">
+                                <span class="rating">⭐ ${m.rating}</span>
+                                <span>${m.year}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function openModal(movieId) {
-            const movie = series.find(m => m.id === movieId);
+            const movie = series.find(m => (m.firebaseKey || m.id) == movieId);
             if (!movie) return;
 
             const modal = document.getElementById('modal');
@@ -595,9 +592,9 @@
         });
 
         window.addEventListener('load', async () => {
-            loadSeries();
+            console.log('Página de séries carregada');
+            loadSeries(); // Inicia listener do Firebase
             await updateAuthArea();
-            renderMovies();
         });
     </script>
 </body>
