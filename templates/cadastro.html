@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuar - Autenticação</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #110e25, #100c2b, #100a36); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
@@ -47,20 +53,6 @@
         .page-transition { animation: fadeInUp 0.6s ease-out; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .hidden { display: none; }
-        .confirm-modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 2002; align-items: center; justify-content: center; }
-        .confirm-modal.active { display: flex; }
-        .confirm-modal-content { background: rgba(17, 14, 37, 0.98); border: 1px solid rgba(128, 99, 231, 0.3); border-radius: 16px; padding: 35px; max-width: 420px; width: 90%; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .confirm-modal-icon { width: 70px; height: 70px; margin: 0 auto 20px; background: rgba(128, 99, 231, 0.15); border: 2px solid rgba(128, 99, 231, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .confirm-modal-icon svg { width: 32px; height: 32px; stroke: #8063e7; }
-        .confirm-modal-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-        .confirm-modal-text { font-size: 14px; color: rgba(255, 255, 255, 0.7); line-height: 1.6; margin-bottom: 28px; }
-        .confirm-modal-buttons { display: flex; gap: 12px; }
-        .confirm-modal-btn { flex: 1; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; }
-        .confirm-modal-btn-cancel { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; }
-        .confirm-modal-btn-cancel:hover { background: rgba(255, 255, 255, 0.12); }
-        .confirm-modal-btn-confirm { background: linear-gradient(135deg, #5c45af, #7c35ec); color: #fff; box-shadow: 0 4px 15px rgba(92, 69, 175, 0.3); }
-        .confirm-modal-btn-confirm:hover { box-shadow: 0 6px 20px rgba(124, 53, 236, 0.5); transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -104,63 +96,21 @@
         <div class="error-message" id="registerError"></div>
     </div>
 
-    <div class="confirm-modal" id="confirmModal">
-        <div class="confirm-modal-content">
-            <div class="confirm-modal-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/>
-                </svg>
-            </div>
-            <h3 class="confirm-modal-title" id="confirmTitle">Confirmação</h3>
-            <p class="confirm-modal-text" id="confirmText">Mensagem</p>
-            <div class="confirm-modal-buttons">
-                <button class="confirm-modal-btn confirm-modal-btn-cancel" id="confirmCancel">Cancelar</button>
-                <button class="confirm-modal-btn confirm-modal-btn-confirm" id="confirmOk">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Funções globais FORA do módulo -->
     <script>
-        function showRegister(e) {
-            e.preventDefault();
-            const loginError = document.getElementById('loginError');
-            const loginPage = document.getElementById('loginPage');
-            const registerPage = document.getElementById('registerPage');
-            loginError.classList.remove('show');
-            loginPage.classList.add('hidden');
-            registerPage.classList.remove('hidden');
-        }
-
-        function showLogin(e) {
-            e.preventDefault();
-            const registerError = document.getElementById('registerError');
-            const loginPage = document.getElementById('loginPage');
-            const registerPage = document.getElementById('registerPage');
-            registerError.classList.remove('show');
-            registerPage.classList.add('hidden');
-            loginPage.classList.remove('hidden');
-        }
-    </script>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
-
+        // Inicializar Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBP-yiGrKJIKRD9k",
+            apiKey: "AIzaSyDhlEtmKXGeAsY9Ih-BBP-y1GrKJIKRD9k",
             authDomain: "nuarkowe.firebaseapp.com",
+            databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
             projectId: "nuarkowe",
             storageBucket: "nuarkowe.firebasestorage.app",
-            messagingSenderId: "1063041816951",
-            appId: "1:1063041816951:web:0ffe4185fd0102b878e972"
+            messagingSenderId: "106304181695",
+            appId: "1:106304181695:web:8ffe4185fd8102b878e972"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
 
         const loginPage = document.getElementById('loginPage'), registerPage = document.getElementById('registerPage');
         const loginForm = document.getElementById('loginForm'), registerForm = document.getElementById('registerForm');
@@ -174,21 +124,8 @@
         }
 
         function hideError(el) { el.classList.remove('show'); }
-
-        function showConfirm(msg) {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('confirmModal');
-                document.getElementById('confirmTitle').textContent = 'Confirmação';
-                document.getElementById('confirmText').textContent = msg;
-                modal.classList.add('active');
-                
-                const ok = () => { modal.classList.remove('active'); document.getElementById('confirmOk').removeEventListener('click', ok); document.getElementById('confirmCancel').removeEventListener('click', cancel); resolve(true); };
-                const cancel = () => { modal.classList.remove('active'); document.getElementById('confirmOk').removeEventListener('click', ok); document.getElementById('confirmCancel').removeEventListener('click', cancel); resolve(false); };
-                
-                document.getElementById('confirmOk').addEventListener('click', ok);
-                document.getElementById('confirmCancel').addEventListener('click', cancel);
-            });
-        }
+        function showRegister(e) { e.preventDefault(); hideError(loginError); loginPage.classList.add('hidden'); registerPage.classList.remove('hidden'); }
+        function showLogin(e) { e.preventDefault(); hideError(registerError); registerPage.classList.add('hidden'); loginPage.classList.remove('hidden'); }
 
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -217,10 +154,18 @@
             btnTxt.textContent = 'Cadastrando...';
             
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Salvar dados no localStorage (sem precisar do Firestore)
+                // Salvar dados no Realtime Database
+                await database.ref(`users/${user.uid}`).set({
+                    username: username,
+                    email: email,
+                    createdAt: Date.now(),
+                    avatar: null
+                });
+                
+                // Salvar no localStorage
                 localStorage.setItem('nuarLoggedUser', JSON.stringify({
                     nome: username,
                     username: username,
@@ -256,27 +201,34 @@
             btnTxt.textContent = 'Entrando...';
             
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Salvar dados do usuário no localStorage
-                localStorage.setItem('nuarLoggedUser', JSON.stringify({
-                    nome: email.split('@')[0],
-                    username: email.split('@')[0],
-                    email: email,
-                    uid: user.uid,
-                    avatar: null
-                }));
+                // Buscar dados do usuário no Realtime Database
+                const snapshot = await database.ref(`users/${user.uid}`).once('value');
                 
-                if (rememberMe) {
-                    localStorage.setItem('nuarRememberUser', JSON.stringify({
-                        email: email,
-                        uid: user.uid
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    localStorage.setItem('nuarLoggedUser', JSON.stringify({
+                        nome: userData.username,
+                        username: userData.username,
+                        email: userData.email,
+                        uid: user.uid,
+                        avatar: userData.avatar || null
                     }));
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('nuarRememberUser', JSON.stringify({
+                            email: email,
+                            uid: user.uid
+                        }));
+                    }
+                    
+                    showError(loginError, '✓ Login realizado!', true);
+                    setTimeout(() => window.location.href = '/inicio.html', 1000);
+                } else {
+                    showError(loginError, 'Dados do usuário não encontrados');
                 }
-                
-                showError(loginError, '✓ Login realizado!', true);
-                setTimeout(() => window.location.href = '/inicio.html', 1000);
             } catch (err) {
                 let errorMsg = 'Email ou senha incorretos';
                 if (err.code === 'auth/user-not-found') errorMsg = 'Usuário não encontrado';
