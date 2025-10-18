@@ -206,8 +206,14 @@
             };
 
             try {
-                // Inicializar
-                window.app = firebase.initializeApp(firebaseConfig);
+                // Verificar se já foi inicializado
+                if (!firebase.apps.length) {
+                    window.app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    window.app = firebase.app();
+                    console.log('ℹ️ Firebase já estava inicializado');
+                }
+                
                 window.auth = firebase.auth();
                 window.database = firebase.database();
                 
@@ -220,7 +226,7 @@
                     document.getElementById('loginPage').classList.remove('hidden');
                 }, 500);
                 
-                // Configurar tudo
+                // Configurar tudo (só uma vez)
                 setupApp();
                 
             } catch (error) {
@@ -229,8 +235,16 @@
             }
         }
 
+        // Flag para evitar múltiplas configurações
+        let isAppConfigured = false;
+
         // Configurar aplicação
         function setupApp() {
+            if (isAppConfigured) {
+                console.log('⚠️ Aplicação já configurada, pulando...');
+                return;
+            }
+            
             console.log('⚙️ Configurando aplicação...');
             
             const loginForm = document.getElementById('loginForm');
@@ -250,13 +264,14 @@
                 });
             });
             
-            // Auth state
+            // Auth state (só uma vez)
             window.auth.onAuthStateChanged((user) => {
                 if (user) {
                     console.log('👤 Usuário logado:', user.email);
                 }
             });
             
+            isAppConfigured = true;
             console.log('✅ Aplicação configurada');
         }
 
