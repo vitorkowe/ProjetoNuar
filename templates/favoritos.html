@@ -3,548 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Favoritos - Nuar</title>
+    <title>Nuar - Autenticação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
-            min-height: 100vh;
-            color: #e0e0e0;
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 40px;
-            background: #0f0f1e;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo img {
-            height: 50px;
-        }
-
-        .back-btn {
-            background: #553ec4;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .back-btn:hover {
-            background: #6d4fd9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(85, 62, 196, 0.4);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: #553ec4;
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: #0f0f1e;
-            color: #e0e0e0;
-            border: 2px solid #2a2a3e;
-            padding: 12px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .tab-btn.active {
-            background: #553ec4;
-            border-color: #553ec4;
-            color: white;
-        }
-
-        .tab-btn:hover {
-            border-color: #553ec4;
-            transform: translateY(-2px);
-        }
-
-        .content {
-            display: none;
-        }
-
-        .content.active {
-            display: block;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: #0f0f1e;
-            border-radius: 15px;
-            border: 2px dashed #2a2a3e;
-        }
-
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        .empty-state h3 {
-            color: #9ca3af;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: #6b7280;
-        }
-
-        .favorites-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 25px;
-        }
-
-        .favorite-card {
-            background: #0f0f1e;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s;
-            border: 2px solid #2a2a3e;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .favorite-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(85, 62, 196, 0.3);
-            border-color: #553ec4;
-        }
-
-        .card-image {
-            width: 100%;
-            height: 300px;
-            background: #2a2a3e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-placeholder {
-            font-size: 60px;
-            opacity: 0.3;
-        }
-
-        .remove-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(220, 38, 38, 0.9);
-            color: white;
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            z-index: 10;
-            opacity: 0;
-        }
-
-        .favorite-card:hover .remove-btn {
-            opacity: 1;
-        }
-
-        .remove-btn:hover {
-            background: rgba(185, 28, 28, 1);
-            transform: scale(1.1);
-        }
-
-        .card-info {
-            padding: 15px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #e0e0e0;
-            margin-bottom: 8px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .card-meta {
-            font-size: 14px;
-            color: #9ca3af;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .rating {
-            color: #fbbf24;
-            font-weight: bold;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(10, 10, 15, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(85, 62, 196, 0.5);
-            color: #fff;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                padding: 20px;
-            }
-
-            .favorites-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 15px;
-            }
-
-            .card-image {
-                height: 220px;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #110e25, #100c2b, #100a36); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 20% 80%, rgba(91, 72, 212, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(124, 53, 236, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .decorative-shape { position: absolute; border-radius: 50%; opacity: 0.03; pointer-events: none; }
+        .shape1 { width: 600px; height: 600px; background: linear-gradient(135deg, #8063e7, #5c45af); top: -300px; right: -200px; }
+        .shape2 { width: 400px; height: 400px; background: linear-gradient(135deg, #7c35ec, #5c45af); bottom: -200px; left: -100px; }
+        .auth-container { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 60px 50px; width: 100%; max-width: 480px; position: relative; z-index: 10; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; }
+        .logo { display: flex; justify-content: center; margin-bottom: 40px; }
+        .logo img { height: 50px; filter: drop-shadow(0 0 10px rgba(91, 72, 212, 0.5)); }
+        .auth-header { text-align: center; margin-bottom: 40px; }
+        .auth-title { font-size: 32px; font-weight: 700; margin-bottom: 10px; background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.8)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .auth-subtitle { font-size: 15px; color: rgba(255, 255, 255, 0.6); }
+        .auth-form { display: flex; flex-direction: column; gap: 20px; }
+        .input-group { position: relative; }
+        .auth-input { width: 100%; padding: 18px 55px 18px 20px; background: rgba(20, 20, 30, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px; color: #fff; font-size: 15px; transition: all 0.3s; }
+        .auth-input:focus { outline: none; border-color: rgba(128, 99, 231, 0.6); background: rgba(25, 20, 40, 0.9); box-shadow: 0 0 0 3px rgba(128, 99, 231, 0.1); }
+        .auth-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .auth-options { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-top: -5px; }
+        .remember-me { display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255, 255, 255, 0.7); transition: color 0.3s; }
+        .remember-me:hover { color: #fff; }
+        .remember-me input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #5c45af; }
+        .auth-submit { width: 100%; padding: 18px; background: linear-gradient(135deg, #5c45af, #7c35ec); border: 2px solid rgba(128, 99, 231, 0.3); border-radius: 50px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; position: relative; overflow: hidden; }
+        .auth-submit::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent); transform: translateX(-100%); transition: transform 0.6s; }
+        .auth-submit:hover::before { transform: translateX(100%); }
+        .auth-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(124, 53, 236, 0.4); border-color: rgba(128, 99, 231, 0.6); }
+        .auth-submit:active { transform: translateY(0); }
+        .auth-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+        .arrow-icon { width: 20px; height: 20px; border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .auth-footer { text-align: center; margin-top: 30px; font-size: 15px; color: rgba(255, 255, 255, 0.7); }
+        .auth-switch { color: #fff; text-decoration: none; font-weight: 600; cursor: pointer; transition: color 0.3s; border-bottom: 1px solid transparent; }
+        .auth-switch:hover { color: #8063e7; border-bottom-color: #8063e7; }
+        .terms-text { text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.5); margin-top: 25px; line-height: 1.6; }
+        .terms-text a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .terms-text a:hover { color: #8063e7; }
+        .error-message { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; padding: 15px 20px; color: #f87171; font-size: 14px; text-align: center; margin-top: 20px; animation: slideDown 0.4s ease-out; display: none; }
+        .error-message.show { display: block; }
+        .error-message.success { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.4); color: #4ade80; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .page-transition { animation: fadeInUp 0.6s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .hidden { display: none; }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #8063e7; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: #fff; font-size: 16px; }
+        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 13px; margin-top: 20px; }
+        .status-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .status-error { background: rgba(220, 38, 38, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .status-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
     </style>
 </head>
 <body>
-    <!-- VERIFICAÇÃO DE LOGIN -->
+    <div class="decorative-shape shape1"></div>
+    <div class="decorative-shape shape2"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Carregando Firebase...</div>
+        <div class="status-badge status-warning" id="loadingStatus">Aguardando scripts...</div>
+    </div>
+
+    <div class="auth-container page-transition hidden" id="loginPage">
+        <div class="logo"><img src="https://i.ibb.co/DDyKRKY6/nuarrr.png" alt="Nuar"></div>
+        <div class="auth-header">
+            <h1 class="auth-title">Conta de usuário</h1>
+            <p class="auth-subtitle">Uma única conta, Conteúdo infinitamente grátis</p>
+        </div>
+        <form class="auth-form" id="loginForm">
+            <div class="input-group"><input type="email" class="auth-input" id="loginEmail" placeholder="Seu email" required></div>
+            <div class="input-group"><input type="password" class="auth-input" id="loginPassword" placeholder="Sua senha" required></div>
+            <div class="auth-options">
+                <label class="remember-me"><input type="checkbox" id="rememberMe"><span>Lembrar a conta?</span></label>
+            </div>
+            <button type="submit" class="auth-submit"><span class="arrow-icon">→</span><span>Logar na Conta</span></button>
+        </form>
+        <div class="auth-footer">Ainda não é usuário? <a href="#" class="auth-switch" onclick="showRegister(event)">Faça seu Cadastro!</a></div>
+        <div class="error-message" id="loginError"></div>
+    </div>
+
+    <div class="auth-container page-transition hidden" id="registerPage">
+        <div class="logo"><img src="https://i.ibb.co/DDyKRKY6/nuarrr.png" alt="Nuar"></div>
+        <div class="auth-header">
+            <h1 class="auth-title">Novo Usuário</h1>
+            <p class="auth-subtitle">Tenha acesso a sua conta em segundos</p>
+        </div>
+        <form class="auth-form" id="registerForm">
+            <div class="input-group"><input type="text" class="auth-input" id="registerUsername" placeholder="Nome de usuário único" required></div>
+            <div class="input-group"><input type="email" class="auth-input" id="registerEmail" placeholder="Seu email" required></div>
+            <div class="input-group"><input type="password" class="auth-input" id="registerPassword" placeholder="Sua senha" required minlength="6"></div>
+            <div class="input-group"><input type="password" class="auth-input" id="registerConfirmPassword" placeholder="Repita sua senha" required></div>
+            <div class="input-group"><input type="text" class="auth-input" id="registerAccessCode" placeholder="Código de acesso" required></div>
+            <p class="terms-text">Criando essa conta, você aceita os <a href="/termos.html" target="_blank">termos de responsabilidade</a></p>
+            <button type="submit" class="auth-submit"><span class="arrow-icon">✓</span><span>Enviar Cadastro</span></button>
+        </form>
+        <div class="auth-footer">Já é usuário? <a href="#" class="auth-switch" onclick="showLogin(event)">Entre na sua conta!</a></div>
+        <div class="error-message" id="registerError"></div>
+    </div>
+
+    <!-- Carregar Firebase de forma sequencial -->
     <script>
-        const loggedUser = localStorage.getItem('nuarLoggedUser');
-        if (!loggedUser) {
-            alert('Você precisa estar logado!');
-            window.location.href = '/cadastro.html';
-        }
-    </script>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        // Proteção contra loop de reload
+        const LOAD_KEY = 'nuar_loading_attempt';
+        const MAX_RETRIES = 3;
+        const RETRY_TIMEOUT = 5000; // 5 segundos
         
-        const firebaseConfig = {
-            apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBp-yiQrKJIKRD9k",
-            authDomain: "nuarkowe.firebaseapp.com",
-            projectId: "nuarkowe",
-            storageBucket: "nuarkowe.firebasestorage.app",
-            messagingSenderId: "1063041816951",
-            appId: "1:1063041816951:web:0ffe4185fd0102b878e972"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-    </script>
-
-    <!-- Resto do HTML aqui -->
-</body>
-    <div class="header">
-        <div class="logo">
-            <img src="https://i.ibb.co/DDyKRKY6/nuarrr.png" alt="Nuar">
-        </div>
-        <a href="/inicio.html" class="back-btn">← Voltar</a>
-    </div>
-
-    <div class="container">
-        <h1>Meus Favoritos</h1>
-
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('todos')">Todos</button>
-            <button class="tab-btn" onclick="switchTab('filmes')">Filmes</button>
-            <button class="tab-btn" onclick="switchTab('series')">Séries</button>
-            <button class="tab-btn" onclick="switchTab('animes')">Animes</button>
-        </div>
-
-        <div id="todos" class="content active">
-            <div id="todos-grid" class="favorites-grid"></div>
-        </div>
-
-        <div id="filmes" class="content">
-            <div id="filmes-grid" class="favorites-grid"></div>
-        </div>
-
-        <div id="series" class="content">
-            <div id="series-grid" class="favorites-grid"></div>
-        </div>
-
-        <div id="animes" class="content">
-            <div id="animes-grid" class="favorites-grid"></div>
-        </div>
-    </div>
-
-    <div class="toast" id="toast">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-        </svg>
-        <span id="toastMessage"></span>
-    </div>
-
-    <script>
-        // Base de dados completa (mesma do inicio.html)
-        const allContent = {
-            filmes: [
-                {id: 1, title: "Meu Malvado Favorito 4", year: 2024, rating: 6.5, duration: "1h 34m", genres: ["Animação", "Aventura"], description: "Gru dá as boas-vindas a um novo membro da família, Gru Jr., que pretende atormentar seu pai.", imageUrl: "https://br.web.img3.acsta.net/img/6c/71/6c71afa89fd8ed8999b3e04d8d794a0e.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7510222", type: 'filme'},
-                {id: 2, title: "Duna 2", year: 2024, rating: 8.0, duration: "2h 46m", genres: ["Ficção científica", "Aventura"], description: "Paul Atreides se une a Chani e aos Fremen enquanto busca vingança.", imageUrl: "https://ingresso-a.akamaihd.net/prd/img/movie/duna-parte-2/3971d5d6-702d-40d8-b990-872d4ffe3e32.webp", videoUrl: "https://embed.warezcdn.cc/filme/tt15239678", type: 'filme'},
-                {id: 3, title: "Bailarina", year: 2025, rating: 7.2, duration: "2h 5m", genres: ["Ação", "Aventura"], description: "Treinada nas tradições assassinas, Eve Macarro enfrenta um exército de assassinos.", imageUrl: "https://m.media-amazon.com/images/M/MV5BMDQzMDRhMDItYWEzMi00Mzk2LTg3M2EtNzMzNGRlYTNlMmZkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7181546", type: 'filme'},
-                {id: 4, title: "Traga ela de volta", year: 2025, rating: 8.5, duration: "1h 36min", genres: ["Terror", "Suspense"], description: "Faça Ela Voltar acompanha a vida de dois meio-irmãos que, após encontrarem seu pai morto no banheiro, são alocados para um lar adotivo.", imageUrl: "https://preview.redd.it/bring-her-back-v0-95sztzhlskaf1.jpeg?auto=webp&s=5d6317c75c4203172cc7f44ad87104d1ddad37d3", videoUrl: "https://embed.warezcdn.cc/filme/tt32246771", type: 'filme'}
-            ],
-            series: [
-                {id: 101, title: "Breaking Bad", year: 2008, rating: 9.5, duration: "5 temporadas", genres: ["Drama", "Crime"], description: "Um professor diagnosticado com câncer se junta a um ex-aluno para produzir metanfetamina.", imageUrl: "https://img.elo7.com.br/product/685x685/26A857B/big-poster-serie-breaking-bad-lo02-tamanho-90x60-cm-poster.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt0903747", type: 'serie'},
-                {id: 102, title: "Stranger Things", year: 2016, rating: 8.7, duration: "4 temporadas", genres: ["Ficção científica", "Terror"], description: "Quando um garoto desaparece, sua mãe e amigos enfrentam forças aterrorizantes.", imageUrl: "https://i.pinimg.com/1200x/00/ea/7c/00ea7c88e9e80f8bea6d13f3f7f0a810.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt4574334", type: 'serie'},
-            ],
-            animes: [
-                {id: 201, title: "Kaiju No. 8", year: 2024, rating: 9.0, duration: "1 temporada", genres: ["Ação", "Fantasia"], description: "Kaiju No. 8 é uma série de mangá japonesa escrita e ilustrada por Naoya Matsumoto.", imageUrl: "https://upload.wikimedia.org/wikipedia/pt/9/92/Kaiju_N%C2%BA_8.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt21975436", type: 'anime'},
-                {id: 202, title: "Gachiakuta", year: 2025, rating: 8.6, duration: "1 temporada", genres: ["Ação", "Aventura"], description: "Gachiakuta se passa em uma sociedade dividida entre uma cidade flutuante e um lixão no nível inferior.", imageUrl: "https://m.media-amazon.com/images/M/MV5BZDU5ZmEzODYtMDU2OS00NTZiLTk4MWYtYWUyZWUzNGU2ODdjXkEyXkFqcGc@._V1_.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt32612521", type: 'anime'}
-            ]
-        };
-
-        let favorites = {
-            filmes: [],
-            series: [],
-            animes: []
-        };
-
-        // Carrega favoritos do localStorage
-        function loadFavorites() {
-            try {
-                const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-                
-                if (!loggedUser) {
-                    alert('Você precisa estar logado para ver seus favoritos!');
-                    window.location.href = '/index.html';
-                    return;
-                }
-
-                const savedFavorites = localStorage.getItem(`nuarFavorites_${loggedUser.email || loggedUser.username}`);
-                
-                if (savedFavorites) {
-                    const favoriteIds = JSON.parse(savedFavorites);
-                    console.log('💜 IDs dos favoritos:', favoriteIds);
-                    
-                    // Busca os dados completos de cada favorito
-                    favoriteIds.forEach(id => {
-                        const filme = allContent.filmes.find(f => f.id === id);
-                        const serie = allContent.series.find(s => s.id === id);
-                        const anime = allContent.animes.find(a => a.id === id);
-                        
-                        if (filme) favorites.filmes.push(filme);
-                        if (serie) favorites.series.push(serie);
-                        if (anime) favorites.animes.push(anime);
-                    });
-                    
-                    console.log('✅ Favoritos carregados:', favorites);
-                }
-                
-                renderFavorites();
-            } catch (error) {
-                console.error('❌ Erro ao carregar favoritos:', error);
-                alert('Erro ao carregar favoritos. Tente novamente.');
-            }
-        }
-
-        function renderFavorites() {
-            const todosGrid = document.getElementById('todos-grid');
-            const filmesGrid = document.getElementById('filmes-grid');
-            const seriesGrid = document.getElementById('series-grid');
-            const animesGrid = document.getElementById('animes-grid');
-
-            // Limpar grids
-            todosGrid.innerHTML = '';
-            filmesGrid.innerHTML = '';
-            seriesGrid.innerHTML = '';
-            animesGrid.innerHTML = '';
-
-            // Todos os favoritos
-            const allFavorites = [...favorites.filmes, ...favorites.series, ...favorites.animes];
+        // Verificar tentativas de carregamento
+        function checkLoadLoop() {
+            const now = Date.now();
+            const lastAttempt = localStorage.getItem(LOAD_KEY);
             
-            if (allFavorites.length === 0) {
-                todosGrid.innerHTML = getEmptyState();
-            } else {
-                allFavorites.forEach(item => {
-                    todosGrid.innerHTML += createCard(item);
-                });
-            }
-
-            // Filmes
-            if (favorites.filmes.length === 0) {
-                filmesGrid.innerHTML = getEmptyState('filmes');
-            } else {
-                favorites.filmes.forEach(item => {
-                    filmesGrid.innerHTML += createCard(item);
-                });
-            }
-
-            // Séries
-            if (favorites.series.length === 0) {
-                seriesGrid.innerHTML = getEmptyState('séries');
-            } else {
-                favorites.series.forEach(item => {
-                    seriesGrid.innerHTML += createCard(item);
-                });
-            }
-
-            // Animes
-            if (favorites.animes.length === 0) {
-                animesGrid.innerHTML = getEmptyState('animes');
-            } else {
-                favorites.animes.forEach(item => {
-                    animesGrid.innerHTML += createCard(item);
-                });
-            }
-        }
-
-        function createCard(item) {
-            return `
-                <div class="favorite-card" onclick="window.location.href='inicio'">
-                    <div class="card-image">
-                        <img src="${item.imageUrl}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=card-placeholder>🎬</div>'">
-                        <button class="remove-btn" onclick="event.stopPropagation(); removeFavorite(${item.id})" title="Remover dos favoritos">×</button>
-                    </div>
-                    <div class="card-info">
-                        <div class="card-title" title="${item.title}">${item.title}</div>
-                        <div class="card-meta">
-                            <span>${item.year}</span>
-                            <span class="rating">⭐ ${item.rating}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getEmptyState(type = '') {
-            const message = type ? `Você ainda não favoritou nenhum ${type}` : 'Você ainda não tem favoritos';
-            return `
-                <div class="empty-state">
-                    <svg fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                    </svg>
-                    <h3>${message}</h3>
-                    <p>Comece a favoritar seus conteúdos preferidos!</p>
-                </div>
-            `;
-        }
-
-        function removeFavorite(id) {
-            if (confirm('Deseja remover este item dos favoritos?')) {
-                try {
-                    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-                    if (!loggedUser) return;
-
-                    const savedFavorites = localStorage.getItem(`nuarFavorites_${loggedUser.email || loggedUser.username}`);
-                    if (savedFavorites) {
-                        let favoriteIds = JSON.parse(savedFavorites);
-                        favoriteIds = favoriteIds.filter(favId => favId !== id);
-                        localStorage.setItem(`nuarFavorites_${loggedUser.email || loggedUser.username}`, JSON.stringify(favoriteIds));
-                        
-                        showToast('Removido dos favoritos!');
-                        
-                        // Recarrega a página
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 500);
+            if (lastAttempt) {
+                const attempts = JSON.parse(lastAttempt);
+                const timeDiff = now - attempts.timestamp;
+                
+                // Se última tentativa foi há menos de 5 segundos
+                if (timeDiff < RETRY_TIMEOUT) {
+                    if (attempts.count >= MAX_RETRIES) {
+                        console.error('❌ Loop detectado! Parando recarregamentos.');
+                        document.getElementById('loadingOverlay').innerHTML = `
+                            <div style="text-align: center; padding: 40px;">
+                                <h2 style="color: #f87171; margin-bottom: 20px;">⚠️ Loop Detectado</h2>
+                                <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
+                                    A página está tentando recarregar continuamente.<br>
+                                    Isso pode ser um problema de configuração.
+                                </p>
+                                <button onclick="localStorage.removeItem('${LOAD_KEY}'); location.reload()" style="
+                                    padding: 12px 24px;
+                                    background: #5c45af;
+                                    border: none;
+                                    border-radius: 8px;
+                                    color: white;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                    margin: 5px;
+                                ">Resetar e Tentar Novamente</button>
+                            </div>
+                        `;
+                        return false;
                     }
-                } catch (error) {
-                    console.error('❌ Erro ao remover favorito:', error);
-                    alert('Erro ao remover favorito');
+                    // Incrementar contador
+                    localStorage.setItem(LOAD_KEY, JSON.stringify({
+                        count: attempts.count + 1,
+                        timestamp: now
+                    }));
+                } else {
+                    // Resetar se passou tempo suficiente
+                    localStorage.setItem(LOAD_KEY, JSON.stringify({
+                        count: 1,
+                        timestamp: now
+                    }));
                 }
+            } else {
+                // Primeira tentativa
+                localStorage.setItem(LOAD_KEY, JSON.stringify({
+                    count: 1,
+                    timestamp: now
+                }));
+            }
+            
+            return true;
+        }
+        
+        // Limpar flag após carregamento bem-sucedido
+        function clearLoadFlag() {
+            setTimeout(() => {
+                localStorage.removeItem(LOAD_KEY);
+                console.log('✅ Flag de carregamento limpa');
+            }, 2000);
+        }
+        
+        console.log('🚀 Iniciando carregamento do Firebase...');
+        
+        // Verificar loop antes de continuar
+        if (!checkLoadLoop()) {
+            console.error('❌ Carregamento bloqueado por proteção de loop');
+            throw new Error('Loop detectado');
+        }
+        
+        // Atualizar status
+        function updateLoadingStatus(message, type = 'warning') {
+            const statusEl = document.getElementById('loadingStatus');
+            if (statusEl) {
+                statusEl.textContent = message;
+                statusEl.className = 'status-badge status-' + type;
             }
         }
 
-        function switchTab(tabName) {
-            // Remove active de todos os botões e conteúdos
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
-            
-            // Adiciona active no botão clicado e conteúdo correspondente
-            event.target.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
+        // Carregar script dinamicamente
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                console.log('📦 Carregando:', src);
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    console.log('✅ Carregado:', src);
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error('❌ Erro ao carregar:', src);
+                    reject(new Error('Falha ao carregar: ' + src));
+                };
+                document.head.appendChild(script);
+            });
         }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            toastMessage.textContent = message;
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+        // Carregar Firebase em sequência
+        async function loadFirebase() {
+            try {
+                updateLoadingStatus('Carregando Firebase App...', 'warning');
+                await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+                
+                updateLoadingStatus('Carregando Firebase Auth...', 'warning');
+                await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js');
+                
+                updateLoadingStatus('Carregando Firebase Database...', 'warning');
+                await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js');
+                
+                updateLoadingStatus('Firebase carregado!', 'success');
+                console.log('✅ Todos os scripts carregados');
+                
+                // Aguardar 500ms para garantir que tudo está pronto
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Inicializar app
+                await initializeFirebaseApp();
+                
+            } catch (error) {
+                console.error('❌ Erro fatal ao carregar Firebase:', error);
+                updateLoadingStatus('Erro ao carregar Firebase', 'error');
+                
+                // Mostrar erro na tela
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <h2 style="color: #f87171; margin-bottom: 20px;">⚠️ Erro ao Carregar</h2>
+                            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">
+                                Não foi possível carregar os scripts do Firebase.<br>
+                                Verifique sua conexão ou desative bloqueadores de anúncios.
+                            </p>
+                            <button onclick="location.reload()" style="
+                                padding: 12px 24px;
+                                background: #5c45af;
+                                border: none;
+                                border-radius: 8px;
+                                color: white;
+                                cursor: pointer;
+                                font-size: 14px;
+                            ">Tentar Novamente</button>
+                        </div>
+                    `;
+                }, 2000);
+            }
         }
 
-        // Carrega favoritos ao iniciar
-        window.addEventListener('load', () => {
-            console.log('🚀 Página de favoritos carregada');
-            loadFavorites();
-        });
+        // Inicializar Firebase
+        async function initializeFirebaseApp() {
+            console.log('🔧 Inicializando Firebase App...');
+            
+            // Verificar se firebase existe
+            if (typeof firebase === 'undefined') {
+                throw new Error('Firebase não está definido após carregar os scripts');
+            }
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBP-yiGrKJIKRD9k",
+                authDomain: "nuarkowe.firebaseapp.com",
+                databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
+                projectId: "nuarkowe",
+                storageBucket: "nuarkowe.firebasestorage.app",
+                messagingSenderId: "1063041816951",
+                appId: "1:1063041816951:web:0ffe4185fd0102b878e972"
+            };
+
+            try {
+                // Verificar se já foi inicializado
+                if (!firebase.apps.length) {
+                    window.app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    window.app = firebase.app();
+                    console.log('ℹ️ Firebase já estava inicializado');
+                }
+                
+                window.auth = firebase.auth();
+                window.database = firebase.database();
+                
+                console.log('✅ Firebase inicializado:', window.app.name);
+                updateLoadingStatus('Sistema pronto!', 'success');
+                
+                // Limpar flag de carregamento (sucesso!)
+                clearLoadFlag();
+                
+                console.log('🎨 Preparando transição visual...');
+                
+                // Esconder loading e mostrar formulário com delay para garantir renderização
+                setTimeout(() => {
+                    const loadingEl = document.getElementById('loadingOverlay');
+                    const loginEl = document.getElementById('loginPage');
+                    
+                    console.log('🔄 Escondendo loading overlay...');
+                    loadingEl.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        loadingEl.style.display = 'none';
+                        console.log('✅ Loading escondido');
+                        
+                        console.log('🔄 Mostrando formulário de login...');
+                        loginEl.classList.remove('hidden');
+                        loginEl.style.display = 'flex';
+                        console.log('✅ Formulário visível');
+                    }, 300);
+                }, 800);
+                
+                // Configurar tudo (só uma vez)
+                setupApp();
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar Firebase:', error);
+                throw error;
+            }
+        }
+
+        // Flag para evitar múltiplas configurações
+        let isAppConfigured = false;
+
+        // Configurar aplicação
+        function setupApp() {
+            if (isAppConfigured) {
+                console.log('⚠️ Aplicação já configurada, pulando...');
+                return;
+            }
+            
+            console.log('⚙️ Configurando aplicação...');
+            
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            // Cadastro
+            registerForm.addEventListener('submit', handleRegister);
+            
+            // Login
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Limpar erros ao digitar
+            document.querySelectorAll('.auth-input').forEach(input => {
+                input.addEventListener('input', () => {
+                    hideError(document.getElementById('loginError'));
+                    hideError(document.getElementById('registerError'));
+                });
+            });
+            
+            // Auth state (só uma vez) - SEM REDIRECIONAMENTO AUTOMÁTICO
+            window.auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('👤 Usuário logado:', user.email);
+                    // NÃO redirecionar automaticamente - só mostrar no console
+                }
+            });
+            
+            isAppConfigured = true;
+            console.log('✅ Aplicação configurada');
+        }
+
+        // Funções auxiliares
+        function showError(el, msg, success = false) {
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.toggle('success', success);
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 5000);
+        }
+
+        function hideError(el) {
+            if (!el) return;
+            el.classList.remove('show');
+        }
+
+        function showRegister(e) {
+            e.preventDefault();
+            hideError(document.getElementById('loginError'));
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+        }
+
+        function showLogin(e) {
+            e.preventDefault();
+            hideError(document.getElementById('registerError'));
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        // Handle cadastro
+        async function handleRegister(e) {
+            e.preventDefault();
+            const registerError = document.getElementById('registerError');
+            hideError(registerError);
+            
+            const btn = e.target.querySelector('.auth-submit');
+            const btnTxt = btn.querySelector('span:last-child');
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const accessCode = document.getElementById('registerAccessCode').value.trim();
+            
+            // Validações
+            if (!username || !email || !password || !confirmPassword || !accessCode) {
+                return showError(registerError, '⚠️ Preencha todos os campos.');
+            }
+            
+            if (accessCode !== 'delinquentes') {
+                showError(registerError, '❌ Código de acesso inválido.');
+                document.getElementById('registerAccessCode').value = '';
+                return;
+            }
+            
+            if (username.length < 3) {
+                return showError(registerError, '⚠️ Nome muito curto (mín. 3).');
+            }
+            
+            if (password !== confirmPassword) {
+                return showError(registerError, '⚠️ Senhas não coincidem.');
+            }
+            
+            if (password.length < 6) {
+                return showError(registerError, '⚠️ Senha muito curta (mín. 6).');
+            }
+            
+            btn.disabled = true;
+            btnTxt.textContent = 'Cadastrando...';
+            
+            try {
+                const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                await window.database.ref(`users/${user.uid}`).set({
+                    username: username,
+                    email: email,
+                    createdAt: Date.now(),
+                    avatar: null
+                });
+                
+                localStorage.setItem('nuarLoggedUser', JSON.stringify({
+                    nome: username,
+                    username: username,
+                    email: email,
+                    uid: user.uid,
+                    avatar: null
+                }));
+                
+                showError(registerError, `✓ Bem-vindo, ${username}!`, true);
+                setTimeout(() => window.location.href = '/inicio.html', 1500);
+                
+            } catch (err) {
+                console.error(err);
+                let errorMsg = 'Erro ao criar conta';
+                if (err.code === 'auth/email-already-in-use') errorMsg = '❌ Email já cadastrado';
+                if (err.code === 'auth/invalid-email') errorMsg = '❌ Email inválido';
+                if (err.code === 'auth/weak-password') errorMsg = '❌ Senha muito fraca';
+                showError(registerError, errorMsg);
+            } finally {
+                btn.disabled = false;
+                btnTxt.textContent = 'Enviar Cadastro';
+            }
+        }
+
+        // Handle login
+        async function handleLogin(e) {
+            e.preventDefault();
+            const loginError = document.getElementById('loginError');
+            hideError(loginError);
+            
+            const btn = e.target.querySelector('.auth-submit');
+            const btnTxt = btn.querySelector('span:last-child');
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            if (!email || !password) {
+                return showError(loginError, '⚠️ Preencha email e senha.');
+            }
+            
+            btn.disabled = true;
+            btnTxt.textContent = 'Entrando...';
+            
+            try {
+                const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                const snapshot = await window.database.ref(`users/${user.uid}`).once('value');
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    
+                    localStorage.setItem('nuarLoggedUser', JSON.stringify({
+                        nome: userData.username,
+                        username: userData.username,
+                        email: userData.email,
+                        uid: user.uid,
+                        avatar: userData.avatar || null
+                    }));
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('nuarRememberUser', JSON.stringify({
+                            email: email,
+                            uid: user.uid
+                        }));
+                    }
+                    
+                    showError(loginError, '✓ Login realizado!', true);
+                    setTimeout(() => window.location.href = '/inicio.html', 1000);
+                } else {
+                    showError(loginError, '❌ Dados não encontrados');
+                }
+            } catch (err) {
+                console.error(err);
+                let errorMsg = '❌ Email ou senha incorretos';
+                if (err.code === 'auth/user-not-found') errorMsg = '❌ Usuário não encontrado';
+                if (err.code === 'auth/wrong-password') errorMsg = '❌ Senha incorreta';
+                if (err.code === 'auth/invalid-credential') errorMsg = '❌ Credenciais inválidas';
+                showError(loginError, errorMsg);
+            } finally {
+                btn.disabled = false;
+                btnTxt.textContent = 'Logar na Conta';
+            }
+        }
+
+        // Iniciar carregamento quando DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadFirebase);
+        } else {
+            loadFirebase();
+        }
     </script>
 </body>
 </html>
