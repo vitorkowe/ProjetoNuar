@@ -1393,11 +1393,11 @@
     <div class="header">
         <div class="header-top">
             <div class="header-left">
-                <div class="logo" onclick="window.location.href='/'">
+                <div class="logo" onclick="window.location.href='/inicio.html'">
                     <img src="https://i.ibb.co/DDyKRKY6/nuarrr.png" alt="Nuar">
                 </div>
                 <div class="nav-tabs">
-                    <a href="/inicio.html"class="nav-tab active">Início</a>
+                    <a href="/inicio.html" class="nav-tab active">Início</a>
                     <a href="/filmes.html" class="nav-tab">Filmes</a>
                     <a href="/series.html" class="nav-tab">Séries</a>
                     <a href="/animes.html" class="nav-tab">Animes</a>
@@ -1588,20 +1588,16 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO FIREBASE
-        // SUBSTITUA ESTAS CREDENCIAIS PELAS SUAS DO FIREBASE
-        // CONFIGURAÇÃO DO FIREBASE
-const firebaseConfig = {
-    apiKey: "AIzaSyDhlEtmKXGeAsY9Ih-BBP-y1GrKJIKRD9k",
-    authDomain: "nuarkowe.firebaseapp.com",
-    databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
-    projectId: "nuarkowe",
-    storageBucket: "nuarkowe.firebasestorage.app",
-    messagingSenderId: "106304181695",
-    appId: "1:106304181695:web:8ffe4185fd8102b878e972"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhlEtmKXGeAsY9Ih-BBP-y1GrKJIKRD9k",
+            authDomain: "nuarkowe.firebaseapp.com",
+            databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
+            projectId: "nuarkowe",
+            storageBucket: "nuarkowe.firebasestorage.app",
+            messagingSenderId: "106304181695",
+            appId: "1:106304181695:web:8ffe4185fd8102b878e972"
+        };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -1613,11 +1609,9 @@ const firebaseConfig = {
         const ADMIN_PASSWORD = 'nuaradm';
         let content = { filmes: [], series: [], animes: [] };
 
-        // FUNÇÕES DO FIREBASE REALTIME DATABASE
         function loadContentFromFirebase() {
             console.log('Carregando conteúdo do Firebase...');
             
-            // Carregar filmes
             database.ref('content/filmes').on('value', (snapshot) => {
                 const data = snapshot.val();
                 content.filmes = data ? Object.keys(data).map(key => ({...data[key], firebaseKey: key})) : [];
@@ -1625,7 +1619,6 @@ const firebaseConfig = {
                 renderMovies();
             });
 
-            // Carregar séries
             database.ref('content/series').on('value', (snapshot) => {
                 const data = snapshot.val();
                 content.series = data ? Object.keys(data).map(key => ({...data[key], firebaseKey: key})) : [];
@@ -1633,7 +1626,6 @@ const firebaseConfig = {
                 renderMovies();
             });
 
-            // Carregar animes
             database.ref('content/animes').on('value', (snapshot) => {
                 const data = snapshot.val();
                 content.animes = data ? Object.keys(data).map(key => ({...data[key], firebaseKey: key})) : [];
@@ -1666,12 +1658,10 @@ const firebaseConfig = {
         }
 
         function initializeDefaultContent() {
-            // Verificar se já existem dados
             database.ref('content/filmes').once('value', (snapshot) => {
                 if (!snapshot.exists()) {
                     console.log('Inicializando conteúdo padrão...');
                     
-                    // Filmes padrão
                     const defaultFilmes = [
                         {id: "1", title: "Meu Malvado Favorito 4", year: 2024, rating: 6.5, duration: "1h 34m", genres: ["Animação", "Aventura"], description: "Gru dá as boas-vindas a um novo membro da família, Gru Jr., que pretende atormentar seu pai.", imageUrl: "https://br.web.img3.acsta.net/img/6c/71/6c71afa89fd8ed8999b3e04d8d794a0e.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7510222"},
                         {id: "2", title: "Duna 2", year: 2024, rating: 8.0, duration: "2h 46m", genres: ["Ficção científica", "Aventura"], description: "Paul Atreides se une a Chani e aos Fremen enquanto busca vingança.", imageUrl: "https://ingresso-a.akamaihd.net/prd/img/movie/duna-parte-2/3971d5d6-702d-40d8-b990-872d4ffe3e32.webp", videoUrl: "https://embed.warezcdn.cc/filme/tt15239678"},
@@ -1737,29 +1727,61 @@ const firebaseConfig = {
             return (names[0][0] + names[names.length - 1][0]).toUpperCase();
         }
 
-        function saveAvatarToUser(avatarBase64) {
-            const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-            if (!loggedUser) return false;
-            
-            loggedUser.avatar = avatarBase64;
-            localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
-            
-            let users = JSON.parse(localStorage.getItem('nuarUsers') || '[]');
-            const userIndex = users.findIndex(u => 
-                (u.email && u.email === loggedUser.email) || 
-                (u.username && u.username === loggedUser.username)
-            );
-            
-            if (userIndex !== -1) {
-                users[userIndex].avatar = avatarBase64;
-                localStorage.setItem('nuarUsers', JSON.stringify(users));
-            } else {
-                users.push(loggedUser);
-                localStorage.setItem('nuarUsers', JSON.stringify(users));
-            }
-            
-            return true;
-        }
+        async function saveAvatarToFirebase(avatarBase64) {
+
+const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+
+if (!loggedUser || !loggedUser.uid) {
+
+    console.error('Usuário não possui UID');
+
+    return false;
+
+}
+
+
+
+try {
+
+    // Salvar no Firebase Realtime Database
+
+    await database.ref(`users/${loggedUser.uid}`).update({
+
+        avatar: avatarBase64
+
+    });
+
+    
+
+    // Atualizar localStorage
+
+    loggedUser.avatar = avatarBase64;
+
+    localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
+
+    
+
+    console.log('Avatar salvo no Firebase com sucesso');
+
+    return true;
+
+} catch (error) {
+
+    console.error('Erro ao salvar avatar no Firebase:', error);
+
+    return false;
+
+}
+
+}
+
+// FUNÇÃO DE COMPATIBILIDADE
+
+function saveAvatarToUser(avatarBase64) {
+
+return saveAvatarToFirebase(avatarBase64);
+
+}
 
         function updateAuthArea() {
             const authArea = document.getElementById('authArea');
@@ -1903,27 +1925,38 @@ const firebaseConfig = {
                 reader.readAsDataURL(file);
             }
 
-            confirmBtn.addEventListener('click', () => {
-                if (selectedFile) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const avatarData = e.target.result;
-                        const success = saveAvatarToUser(avatarData);
-                        
-                        if (success) {
-                            const avatar = document.getElementById('userAvatar');
-                            avatar.style.backgroundImage = `url(${avatarData})`;
-                            avatar.textContent = '';
-                            modal.classList.remove('active');
-                            resetModal();
-                            showToast('Avatar atualizado com sucesso');
-                        } else {
-                            alert('Erro ao salvar avatar. Tente novamente.');
-                        }
-                    };
-                    reader.readAsDataURL(selectedFile);
+            confirmBtn.addEventListener('click', async () => {
+    if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const avatarData = e.target.result;
+            
+            // Mostrar loading
+            confirmBtn.disabled = true;
+            const originalText = confirmBtn.textContent;
+            confirmBtn.textContent = 'Salvando...';
+            
+            const success = await saveAvatarToFirebase(avatarData);
+            
+            if (success) {
+                const avatar = document.getElementById('userAvatar');
+                if (avatar) {
+                    avatar.style.backgroundImage = `url(${avatarData})`;
+                    avatar.textContent = '';
                 }
-            });
+                modal.classList.remove('active');
+                resetModal();
+                showToast('Avatar atualizado com sucesso');
+            } else {
+                alert('Erro ao salvar avatar. Tente novamente.');
+            }
+            
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = originalText;
+        };
+        reader.readAsDataURL(selectedFile);
+    }
+});
 
             closeBtn.addEventListener('click', () => {
                 modal.classList.remove('active');
@@ -2402,22 +2435,44 @@ const firebaseConfig = {
             selectedContentType = 'filmes';
         }
 
-        window.addEventListener('load', () => {
-            console.log('Aplicação iniciada');
-            console.log('Conectando ao Firebase Realtime Database...');
+        async function loadUserDataFromFirebase() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    
+    if (!loggedUser || !loggedUser.uid) return;
+    
+    try {
+        const snapshot = await database.ref(`users/${loggedUser.uid}`).once('value');
+        const userData = snapshot.val();
+        
+        if (userData && userData.avatar) {
+            loggedUser.avatar = userData.avatar;
+            localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
             
-            updateAuthArea();
-            setupModal();
-            setupLogoutModal();
-            setupAdminPanel();
-            loadFavorites();
-            
-            // Inicializar conteúdo padrão se necessário
-            initializeDefaultContent();
-            
-            // Carregar conteúdo do Firebase
-            loadContentFromFirebase();
-        });
+            const avatar = document.getElementById('userAvatar');
+            if (avatar) {
+                avatar.style.backgroundImage = `url(${userData.avatar})`;
+                avatar.textContent = '';
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar dados do Firebase:', error);
+    }
+}
+
+window.addEventListener('load', () => {
+    console.log('Aplicação iniciada');
+    console.log('Conectando ao Firebase Realtime Database...');
+    
+    updateAuthArea();
+    setupModal();
+    setupLogoutModal();
+    setupAdminPanel();
+    loadFavorites();
+    loadUserDataFromFirebase();
+    
+    initializeDefaultContent();
+    loadContentFromFirebase();
+});
     </script>
 </body>
 </html>
