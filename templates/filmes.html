@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filmes - Nuar</title>
+    
+    <!-- Firebase SDK - COLOCAR NO HEAD -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -330,6 +335,13 @@
             margin-bottom: 20px;
             opacity: 0.3;
         }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -341,35 +353,17 @@
         }
     </script>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBp-yiQrKJIKRD9k",
-            authDomain: "nuarkowe.firebaseapp.com",
-            projectId: "nuarkowe",
-            storageBucket: "nuarkowe.firebasestorage.app",
-            messagingSenderId: "1063041816951",
-            appId: "1:1063041816951:web:0ffe4185fd0102b878e972"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-    </script>
-
-    <!-- Resto do HTML aqui -->
-</body>
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                <div class="logo" onclick="window.location.href='/'">
+                <div class="logo" onclick="window.location.href='/inicio.html'">
                     <img src="https://i.ibb.co/DDyKRKY6/nuarrr.png" alt="Nuar">
                 </div>
                 <div class="nav-tabs">
-                    <a href="inicio" class="nav-tab">Início</a>
-                    <a href="filmes" class="nav-tab active">Filmes</a>
-                    <a href="series" class="nav-tab">Séries</a>
-                    <a href="animes" class="nav-tab">Animes</a>
+                    <a href="/inicio.html" class="nav-tab">Início</a>
+                    <a href="/filmes.html" class="nav-tab active">Filmes</a>
+                    <a href="/series.html" class="nav-tab">Séries</a>
+                    <a href="/animes.html" class="nav-tab">Animes</a>
                 </div>
             </div>
             
@@ -382,7 +376,9 @@
 
     <div class="container">
         <h1 class="page-title">Filmes</h1>
-        <div class="movies-grid" id="moviesGrid"></div>
+        <div class="movies-grid" id="moviesGrid">
+            <div class="loading">Carregando filmes...</div>
+        </div>
     </div>
 
     <div class="modal" id="modal" onclick="if(event.target.id==='modal') closeModal()">
@@ -396,42 +392,39 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // Inicializar Firebase (APENAS UMA VEZ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhlEtmKXGeAsY9Ih-BBP-y1GrKJIKRD9k",
+            authDomain: "nuarkowe.firebaseapp.com",
+            databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
+            projectId: "nuarkowe",
+            storageBucket: "nuarkowe.firebasestorage.app",
+            messagingSenderId: "106304181695",
+            appId: "1:106304181695:web:8ffe4185fd8102b878e972"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         let userFavorites = new Set();
         let filmes = [];
 
-        // Carrega filmes do localStorage
+        // Carrega filmes do Firebase (TEMPO REAL)
         function loadFilmes() {
-            const saved = localStorage.getItem('nuarContent');
-            if (saved) {
-                const content = JSON.parse(saved);
-                filmes = content.filmes || [];
-            } else {
-                // Conteúdo padrão caso não exista no localStorage
-                filmes = [
-                    {id: 1, title: "Meu Malvado Favorito 4", year: 2024, rating: 6.5, duration: "1h 34m", genres: ["Animação", "Aventura"], description: "Gru dá as boas-vindas a um novo membro da família, Gru Jr., que pretende atormentar seu pai.", imageUrl: "https://br.web.img3.acsta.net/img/6c/71/6c71afa89fd8ed8999b3e04d8d794a0e.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7510222"},
-                    {id: 2, title: "Duna 2", year: 2024, rating: 8.0, duration: "2h 46m", genres: ["Ficção científica", "Aventura"], description: "Paul Atreides se une a Chani e aos Fremen enquanto busca vingança.", imageUrl: "https://ingresso-a.akamaihd.net/prd/img/movie/duna-parte-2/3971d5d6-702d-40d8-b990-872d4ffe3e32.webp", videoUrl: "https://embed.warezcdn.cc/filme/tt15239678"},
-                    {id: 3, title: "Bailarina", year: 2025, rating: 7.2, duration: "2h 5m", genres: ["Ação", "Aventura"], description: "Treinada nas tradições assassinas, Eve Macarro enfrenta um exército de assassinos.", imageUrl: "https://m.media-amazon.com/images/M/MV5BMDQzMDRhMDItYWEzMi00Mzk2LTg3M2EtNzMzNGRlYTNlMmZkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7181546"},
-                    {id: 4, title: "Traga ela de volta", year: 2025, rating: 8.5, duration: "1h 36min", genres: ["Terror", "Suspense"], description: "Faça Ela Voltar acompanha a vida de dois meio-irmãos que, após encontrarem seu pai morto no banheiro, são alocados para um lar adotivo.", imageUrl: "https://preview.redd.it/bring-her-back-v0-95sztzhlskaf1.jpeg?auto=webp&s=5d6317c75c4203172cc7f44ad87104d1ddad37d3", videoUrl: "https://embed.warezcdn.cc/filme/tt32246771"}
-                ];
-            }
-            console.log('Filmes carregados:', filmes.length);
-        }
-
-        // Escuta mudanças no localStorage (quando admin adiciona/edita/remove)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'nuarContent') {
-                console.log('Conteúdo atualizado! Recarregando filmes...');
-                loadFilmes();
+            console.log('Configurando listener do Firebase para filmes...');
+            
+            database.ref('content/filmes').on('value', (snapshot) => {
+                const data = snapshot.val();
+                filmes = data ? Object.keys(data).map(key => ({
+                    ...data[key],
+                    firebaseKey: key,
+                    id: data[key].id || key
+                })) : [];
+                
+                console.log('Filmes atualizados do Firebase:', filmes.length);
                 renderMovies();
-            }
-        });
-
-        // Escuta evento customizado da mesma aba
-        window.addEventListener('nuarContentUpdated', () => {
-            console.log('Conteúdo atualizado na mesma aba! Recarregando filmes...');
-            loadFilmes();
-            renderMovies();
-        });
+            });
+        }
 
         async function checkAuth() {
             const loggedUser = localStorage.getItem('nuarLoggedUser');
@@ -463,7 +456,7 @@
 
         function updateFavoriteButtons() {
             document.querySelectorAll('.favorite-btn').forEach(btn => {
-                const itemId = parseInt(btn.dataset.id);
+                const itemId = btn.dataset.id;
                 if (userFavorites.has(itemId)) {
                     btn.classList.add('favorited');
                 } else {
@@ -478,11 +471,11 @@
             const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
             if (!loggedUser) {
                 showToast('Você precisa estar logado para favoritar!');
-                setTimeout(() => window.location.href = 'cadastro', 1500);
+                setTimeout(() => window.location.href = '/cadastro.html', 1500);
                 return;
             }
 
-            const item = filmes.find(m => m.id === itemId);
+            const item = filmes.find(m => (m.firebaseKey || m.id) == itemId);
             if (!item) return;
 
             const btn = event.currentTarget;
@@ -537,31 +530,34 @@
                 return;
             }
 
-            grid.innerHTML = moviesToRender.map(m => `
-                <div class="movie-card" onclick="openModal(${m.id})">
-                    <div class="movie-poster">
-                        <img src="${m.imageUrl}" alt="${m.title}">
-                        <button class="favorite-btn ${userFavorites.has(m.id) ? 'favorited' : ''}" 
-                                data-id="${m.id}" 
-                                onclick="toggleFavorite(event, ${m.id})">
-                            <svg viewBox="0 0 24 24" stroke-width="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-title">${m.title}</div>
-                        <div class="movie-meta">
-                            <span class="rating">⭐ ${m.rating}</span>
-                            <span>${m.year}</span>
+            grid.innerHTML = moviesToRender.map(m => {
+                const itemId = m.firebaseKey || m.id;
+                return `
+                    <div class="movie-card" onclick="openModal('${itemId}')">
+                        <div class="movie-poster">
+                            <img src="${m.imageUrl}" alt="${m.title}">
+                            <button class="favorite-btn ${userFavorites.has(itemId) ? 'favorited' : ''}" 
+                                    data-id="${itemId}" 
+                                    onclick="toggleFavorite(event, '${itemId}')">
+                                <svg viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="movie-info">
+                            <div class="movie-title">${m.title}</div>
+                            <div class="movie-meta">
+                                <span class="rating">⭐ ${m.rating}</span>
+                                <span>${m.year}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function openModal(movieId) {
-            const movie = filmes.find(m => m.id === movieId);
+            const movie = filmes.find(m => (m.firebaseKey || m.id) == movieId);
             if (!movie) return;
 
             const modal = document.getElementById('modal');
@@ -596,9 +592,9 @@
         });
 
         window.addEventListener('load', async () => {
-            loadFilmes();
+            console.log('Página de filmes carregada');
+            loadFilmes(); // Inicia listener do Firebase
             await updateAuthArea();
-            renderMovies();
         });
     </script>
 </body>
