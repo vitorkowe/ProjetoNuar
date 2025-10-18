@@ -7,6 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -539,7 +544,6 @@
             transform: scale(1.1);
         }
 
-        /* BOTÃO DE EDITAR - ADICIONADO */
         .edit-btn {
             position: absolute;
             top: 60px;
@@ -1059,7 +1063,6 @@
             transform: translateY(-2px);
         }
 
-        /* ADMIN STYLES */
         .admin-float-btn {
             position: fixed;
             bottom: 30px;
@@ -1377,6 +1380,13 @@
             background: rgba(239, 68, 68, 0.3);
             border-color: #ef4444;
         }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -1412,7 +1422,7 @@
             <h1 class="hero-title">Bailarina</h1>
             <p class="hero-subtitle">Do Universo de John Wick</p>
             <div class="hero-buttons">
-                <button class="btn-watch" onclick="openModal(3)">
+                <button class="btn-watch" onclick="openModal('3')">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="5 3 19 12 5 21 5 3"/>
                     </svg>
@@ -1431,13 +1441,13 @@
 
     <div class="container">
         <h2 class="section-title">Destaques do Momento</h2>
-        <div class="movies-grid" id="moviesGrid"></div>
+        <div class="movies-grid" id="moviesGrid"><div class="loading">Carregando filmes...</div></div>
 
         <h2 class="section-title">Séries Populares</h2>
-        <div class="movies-grid" id="seriesGrid"></div>
+        <div class="movies-grid" id="seriesGrid"><div class="loading">Carregando séries...</div></div>
 
         <h2 class="section-title">Animes em Alta</h2>
-        <div class="movies-grid" id="animesGrid"></div>
+        <div class="movies-grid" id="animesGrid"><div class="loading">Carregando animes...</div></div>
     </div>
 
     <div class="video-modal" id="modal" onclick="if(event.target.id==='modal') closeModal()">
@@ -1497,7 +1507,6 @@
         </div>
     </div>
 
-    <!-- PAINEL ADMIN -->
     <button class="admin-float-btn" id="adminFloatBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
@@ -1579,43 +1588,128 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE
+        // SUBSTITUA ESTAS CREDENCIAIS PELAS SUAS DO FIREBASE
+        // CONFIGURAÇÃO DO FIREBASE
+const firebaseConfig = {
+    apiKey: "AIzaSyDhlEtmKXGeAsY9Ih-BBP-y1GrKJIKRD9k",
+    authDomain: "nuarkowe.firebaseapp.com",
+    databaseURL: "https://nuarkowe-default-rtdb.firebaseio.com",
+    projectId: "nuarkowe",
+    storageBucket: "nuarkowe.firebasestorage.app",
+    messagingSenderId: "106304181695",
+    appId: "1:106304181695:web:8ffe4185fd8102b878e972"
+};
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         let userFavorites = new Set();
         let selectedFile = null;
         let adminGenres = [];
         let selectedContentType = 'filmes';
         let isEditMode = false;
         const ADMIN_PASSWORD = 'nuaradm';
+        let content = { filmes: [], series: [], animes: [] };
 
-        // Função para carregar conteúdo do localStorage
-        function loadContent() {
-            const saved = localStorage.getItem('nuarContent');
-            if (saved) {
-                return JSON.parse(saved);
-            }
-            return {
-                filmes: [
-                    {id: 1, title: "Meu Malvado Favorito 4", year: 2024, rating: 6.5, duration: "1h 34m", genres: ["Animação", "Aventura"], description: "Gru dá as boas-vindas a um novo membro da família, Gru Jr., que pretende atormentar seu pai.", imageUrl: "https://br.web.img3.acsta.net/img/6c/71/6c71afa89fd8ed8999b3e04d8d794a0e.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7510222"},
-                    {id: 2, title: "Duna 2", year: 2024, rating: 8.0, duration: "2h 46m", genres: ["Ficção científica", "Aventura"], description: "Paul Atreides se une a Chani e aos Fremen enquanto busca vingança.", imageUrl: "https://ingresso-a.akamaihd.net/prd/img/movie/duna-parte-2/3971d5d6-702d-40d8-b990-872d4ffe3e32.webp", videoUrl: "https://embed.warezcdn.cc/filme/tt15239678"},
-                    {id: 3, title: "Bailarina", year: 2025, rating: 7.2, duration: "2h 5m", genres: ["Ação", "Aventura"], description: "Treinada nas tradições assassinas, Eve Macarro enfrenta um exército de assassinos.", imageUrl: "https://m.media-amazon.com/images/M/MV5BMDQzMDRhMDItYWEzMi00Mzk2LTg3M2EtNzMzNGRlYTNlMmZkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7181546"},
-                    {id: 4, title: "Traga ela de volta", year: 2025, rating: 8.5, duration: "1h 36min", genres: ["Terror", "Suspense"], description: "Faça Ela Voltar acompanha a vida de dois meio-irmãos que, após encontrarem seu pai morto no banheiro, são alocados para um lar adotivo.", imageUrl: "https://preview.redd.it/bring-her-back-v0-95sztzhlskaf1.jpeg?auto=webp&s=5d6317c75c4203172cc7f44ad87104d1ddad37d3", videoUrl: "https://embed.warezcdn.cc/filme/tt32246771"}
-                ],
-                series: [
-                    {id: 101, title: "Breaking Bad", year: 2008, rating: 9.5, duration: "5 temporadas", genres: ["Drama", "Crime"], description: "Um professor diagnosticado com câncer se junta a um ex-aluno para produzir metanfetamina.", imageUrl: "https://img.elo7.com.br/product/685x685/26A857B/big-poster-serie-breaking-bad-lo02-tamanho-90x60-cm-poster.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt0903747"},
-                    {id: 102, title: "Stranger Things", year: 2016, rating: 8.7, duration: "4 temporadas", genres: ["Ficção científica", "Terror"], description: "Quando um garoto desaparece, sua mãe e amigos enfrentam forças aterrorizantes.", imageUrl: "https://i.pinimg.com/1200x/00/ea/7c/00ea7c88e9e80f8bea6d13f3f7f0a810.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt4574334"},
-                ],
-                animes: [
-                    {id: 201, title: "Kaiju No. 8", year: 2024, rating: 9.0, duration: "1 temporada", genres: ["Ação", "Fantasia"], description: "Kaiju No. 8 é uma série de mangá japonesa escrita e ilustrada por Naoya Matsumoto.", imageUrl: "https://upload.wikimedia.org/wikipedia/pt/9/92/Kaiju_N%C2%BA_8.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt21975436"},
-                    {id: 202, title: "Gachiakuta", year: 2025, rating: 8.6, duration: "1 temporada", genres: ["Ação", "Aventura"], description: "Gachiakuta se passa em uma sociedade dividida entre uma cidade flutuante e um lixão no nível inferior.", imageUrl: "https://m.media-amazon.com/images/M/MV5BZDU5ZmEzODYtMDU2OS00NTZiLTk4MWYtYWUyZWUzNGU2ODdjXkEyXkFqcGc@._V1_.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt32612521"}
-                ]
-            };
+        // FUNÇÕES DO FIREBASE REALTIME DATABASE
+        function loadContentFromFirebase() {
+            console.log('Carregando conteúdo do Firebase...');
+            
+            // Carregar filmes
+            database.ref('content/filmes').on('value', (snapshot) => {
+                const data = snapshot.val();
+                content.filmes = data ? Object.keys(data).map(key => ({...data[key], firebaseKey: key})) : [];
+                console.log('Filmes carregados:', content.filmes.length);
+                renderMovies();
+            });
+
+            // Carregar séries
+            database.ref('content/series').on('value', (snapshot) => {
+                const data = snapshot.val();
+                content.series = data ? Object.keys(data).map(key => ({...data[key], firebaseKey: key})) : [];
+                console.log('Séries carregadas:', content.series.length);
+                renderMovies();
+            });
+
+            // Carregar animes
+            database.ref('content/animes').on('value', (snapshot) => {
+                const data = snapshot.val();
+                content.animes = data ? Object.keys(data).map(key => ({...data[key], firebaseKey: key})) : [];
+                console.log('Animes carregados:', content.animes.length);
+                renderMovies();
+            });
         }
 
-        let content = loadContent();
+        function saveContentToFirebase(type, itemData) {
+            return new Promise((resolve, reject) => {
+                const newRef = database.ref(`content/${type}`).push();
+                newRef.set(itemData)
+                    .then(() => {
+                        console.log(`${type} salvo no Firebase`);
+                        resolve(newRef.key);
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao salvar:', error);
+                        reject(error);
+                    });
+            });
+        }
 
-        // Função para salvar conteúdo no localStorage
-        function saveContent() {
-            localStorage.setItem('nuarContent', JSON.stringify(content));
-            console.log('Conteúdo salvo no localStorage');
+        function updateContentInFirebase(type, firebaseKey, itemData) {
+            return database.ref(`content/${type}/${firebaseKey}`).update(itemData);
+        }
+
+        function deleteContentFromFirebase(type, firebaseKey) {
+            return database.ref(`content/${type}/${firebaseKey}`).remove();
+        }
+
+        function initializeDefaultContent() {
+            // Verificar se já existem dados
+            database.ref('content/filmes').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    console.log('Inicializando conteúdo padrão...');
+                    
+                    // Filmes padrão
+                    const defaultFilmes = [
+                        {id: "1", title: "Meu Malvado Favorito 4", year: 2024, rating: 6.5, duration: "1h 34m", genres: ["Animação", "Aventura"], description: "Gru dá as boas-vindas a um novo membro da família, Gru Jr., que pretende atormentar seu pai.", imageUrl: "https://br.web.img3.acsta.net/img/6c/71/6c71afa89fd8ed8999b3e04d8d794a0e.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7510222"},
+                        {id: "2", title: "Duna 2", year: 2024, rating: 8.0, duration: "2h 46m", genres: ["Ficção científica", "Aventura"], description: "Paul Atreides se une a Chani e aos Fremen enquanto busca vingança.", imageUrl: "https://ingresso-a.akamaihd.net/prd/img/movie/duna-parte-2/3971d5d6-702d-40d8-b990-872d4ffe3e32.webp", videoUrl: "https://embed.warezcdn.cc/filme/tt15239678"},
+                        {id: "3", title: "Bailarina", year: 2025, rating: 7.2, duration: "2h 5m", genres: ["Ação", "Aventura"], description: "Treinada nas tradições assassinas, Eve Macarro enfrenta um exército de assassinos.", imageUrl: "https://m.media-amazon.com/images/M/MV5BMDQzMDRhMDItYWEzMi00Mzk2LTg3M2EtNzMzNGRlYTNlMmZkXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", videoUrl: "https://embed.warezcdn.cc/filme/tt7181546"},
+                        {id: "4", title: "Traga ela de volta", year: 2025, rating: 8.5, duration: "1h 36min", genres: ["Terror", "Suspense"], description: "Faça Ela Voltar acompanha a vida de dois meio-irmãos que, após encontrarem seu pai morto no banheiro, são alocados para um lar adotivo.", imageUrl: "https://preview.redd.it/bring-her-back-v0-95sztzhlskaf1.jpeg?auto=webp&s=5d6317c75c4203172cc7f44ad87104d1ddad37d3", videoUrl: "https://embed.warezcdn.cc/filme/tt32246771"}
+                    ];
+
+                    defaultFilmes.forEach(filme => {
+                        database.ref('content/filmes').push(filme);
+                    });
+                }
+            });
+
+            database.ref('content/series').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    const defaultSeries = [
+                        {id: "101", title: "Breaking Bad", year: 2008, rating: 9.5, duration: "5 temporadas", genres: ["Drama", "Crime"], description: "Um professor diagnosticado com câncer se junta a um ex-aluno para produzir metanfetamina.", imageUrl: "https://img.elo7.com.br/product/685x685/26A857B/big-poster-serie-breaking-bad-lo02-tamanho-90x60-cm-poster.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt0903747"},
+                        {id: "102", title: "Stranger Things", year: 2016, rating: 8.7, duration: "4 temporadas", genres: ["Ficção científica", "Terror"], description: "Quando um garoto desaparece, sua mãe e amigos enfrentam forças aterrorizantes.", imageUrl: "https://i.pinimg.com/1200x/00/ea/7c/00ea7c88e9e80f8bea6d13f3f7f0a810.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt4574334"}
+                    ];
+
+                    defaultSeries.forEach(serie => {
+                        database.ref('content/series').push(serie);
+                    });
+                }
+            });
+
+            database.ref('content/animes').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    const defaultAnimes = [
+                        {id: "201", title: "Kaiju No. 8", year: 2024, rating: 9.0, duration: "1 temporada", genres: ["Ação", "Fantasia"], description: "Kaiju No. 8 é uma série de mangá japonesa escrita e ilustrada por Naoya Matsumoto.", imageUrl: "https://upload.wikimedia.org/wikipedia/pt/9/92/Kaiju_N%C2%BA_8.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt21975436"},
+                        {id: "202", title: "Gachiakuta", year: 2025, rating: 8.6, duration: "1 temporada", genres: ["Ação", "Aventura"], description: "Gachiakuta se passa em uma sociedade dividida entre uma cidade flutuante e um lixão no nível inferior.", imageUrl: "https://m.media-amazon.com/images/M/MV5BZDU5ZmEzODYtMDU2OS00NTZiLTk4MWYtYWUyZWUzNGU2ODdjXkEyXkFqcGc@._V1_.jpg", videoUrl: "https://embed.warezcdn.cc/serie/tt32612521"}
+                    ];
+
+                    defaultAnimes.forEach(anime => {
+                        database.ref('content/animes').push(anime);
+                    });
+                }
+            });
         }
 
         function loadFavorites() {
@@ -1626,11 +1720,6 @@
             if (savedFavorites) {
                 const favArray = JSON.parse(savedFavorites);
                 userFavorites = new Set(favArray);
-                
-                favArray.forEach(id => {
-                    const btn = document.querySelector(`[data-id="${id}"]`);
-                    if (btn) btn.classList.add('favorited');
-                });
             }
         }
 
@@ -1954,33 +2043,36 @@
             const seriesGrid = document.getElementById('seriesGrid');
             const animesGrid = document.getElementById('animesGrid');
 
-            console.log('Renderizando filmes:', content.filmes.length);
-            console.log('Renderizando séries:', content.series.length);
-            console.log('Renderizando animes:', content.animes.length);
-
             if (moviesGrid) {
-                moviesGrid.innerHTML = content.filmes.map(m => createMovieCard(m, 'filmes')).join('');
+                moviesGrid.innerHTML = content.filmes.length > 0 
+                    ? content.filmes.map(m => createMovieCard(m, 'filmes')).join('')
+                    : '<div class="loading">Nenhum filme encontrado</div>';
             }
             if (seriesGrid) {
-                seriesGrid.innerHTML = content.series.map(m => createMovieCard(m, 'series')).join('');
+                seriesGrid.innerHTML = content.series.length > 0 
+                    ? content.series.map(m => createMovieCard(m, 'series')).join('')
+                    : '<div class="loading">Nenhuma série encontrada</div>';
             }
             if (animesGrid) {
-                animesGrid.innerHTML = content.animes.map(m => createMovieCard(m, 'animes')).join('');
+                animesGrid.innerHTML = content.animes.length > 0 
+                    ? content.animes.map(m => createMovieCard(m, 'animes')).join('')
+                    : '<div class="loading">Nenhum anime encontrado</div>';
             }
         }
 
         function createMovieCard(m, type) {
             const isAdmin = sessionStorage.getItem('nuarAdminAuth') === 'true';
             const genresText = m.genres.join(' • ');
+            const itemId = m.firebaseKey || m.id;
             
             return `
-                <div class="movie-card" onclick="openModal(${m.id})">
+                <div class="movie-card" onclick="openModal('${itemId}')">
                     <div class="movie-poster">
                         <img src="${m.imageUrl}" alt="${m.title}">
                         ${isAdmin ? `
                         <button class="delete-btn show" 
-                                data-id="${m.id}" 
-                                onclick="deleteContent(event, ${m.id}, '${type}')">
+                                data-id="${itemId}" 
+                                onclick="deleteContent(event, '${itemId}', '${type}')">
                             <svg viewBox="0 0 24 24" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"/>
                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -1989,17 +2081,17 @@
                             </svg>
                         </button>
                         <button class="edit-btn show" 
-                                data-id="${m.id}" 
-                                onclick="openEditModal(event, ${m.id}, '${type}')">
+                                data-id="${itemId}" 
+                                onclick="openEditModal(event, '${itemId}', '${type}')">
                             <svg viewBox="0 0 24 24" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                             </svg>
                         </button>
                         ` : ''}
-                        <button class="favorite-btn ${userFavorites.has(m.id) ? 'favorited' : ''}" 
-                                data-id="${m.id}" 
-                                onclick="toggleFavorite(event, ${m.id})">
+                        <button class="favorite-btn ${userFavorites.has(itemId) ? 'favorited' : ''}" 
+                                data-id="${itemId}" 
+                                onclick="toggleFavorite(event, '${itemId}')">
                             <svg viewBox="0 0 24 24" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                             </svg>
@@ -2028,11 +2120,10 @@
             `;
         }
 
-        // FUNÇÃO PARA ABRIR MODAL DE EDIÇÃO - ADICIONADA
         function openEditModal(event, itemId, type) {
             event.stopPropagation();
             
-            const item = content[type].find(i => i.id === itemId);
+            const item = content[type].find(i => (i.firebaseKey || i.id) === itemId);
             if (!item) return;
 
             isEditMode = true;
@@ -2066,16 +2157,22 @@
                 return;
             }
 
-            const item = content[type].find(i => i.id === itemId);
+            const item = content[type].find(i => (i.firebaseKey || i.id) === itemId);
             if (!item) return;
 
             if (confirm(`Deseja realmente remover "${item.title}"?`)) {
-                content[type] = content[type].filter(item => item.id !== itemId);
-                saveContent();
-                renderMovies();
-                const tipoNome = type === 'filmes' ? 'Filme' : 
-                                type === 'series' ? 'Série' : 'Anime';
-                showToast(`${tipoNome} "${item.title}" removido com sucesso`);
+                const firebaseKey = item.firebaseKey;
+                
+                deleteContentFromFirebase(type, firebaseKey)
+                    .then(() => {
+                        const tipoNome = type === 'filmes' ? 'Filme' : 
+                                        type === 'series' ? 'Série' : 'Anime';
+                        showToast(`${tipoNome} "${item.title}" removido com sucesso`);
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao remover:', error);
+                        alert('Erro ao remover conteúdo');
+                    });
             }
         }
 
@@ -2093,7 +2190,9 @@
 
         function openModal(movieId) {
             const allContent = [...content.filmes, ...content.series, ...content.animes];
-            const movie = allContent.find(m => m.id === movieId);
+            const movie = allContent.find(m => (m.firebaseKey || m.id) === movieId);
+            if (!movie) return;
+            
             const modal = document.getElementById('modal');
             const videoPlayer = document.getElementById('videoPlayer');
             const details = document.getElementById('movieDetails');
@@ -2125,7 +2224,6 @@
             document.getElementById('modal').classList.remove('active');
         }
 
-        // FUNÇÕES DO PAINEL ADMIN
         function setupAdminPanel() {
             const floatBtn = document.getElementById('adminFloatBtn');
             const loginModal = document.getElementById('adminLoginModal');
@@ -2222,36 +2320,40 @@
                 };
 
                 if (isEditMode) {
-                    const editId = parseInt(document.getElementById('editingId').value);
+                    const editId = document.getElementById('editingId').value;
                     const editType = document.getElementById('editingType').value;
-                    const index = content[editType].findIndex(i => i.id === editId);
+                    const item = content[editType].find(i => (i.firebaseKey || i.id) === editId);
                     
-                    if (index !== -1) {
-                        content[editType][index] = {
-                            id: editId,
-                            ...itemData
-                        };
-                        saveContent();
-                        renderMovies();
-                        contentModal.classList.remove('active');
-                        resetAdminForm();
-                        const tipoNome = editType === 'filmes' ? 'Filme' : editType === 'series' ? 'Série' : 'Anime';
-                        showToast(`${tipoNome} "${itemData.title}" atualizado com sucesso`);
+                    if (item && item.firebaseKey) {
+                        updateContentInFirebase(editType, item.firebaseKey, itemData)
+                            .then(() => {
+                                contentModal.classList.remove('active');
+                                resetAdminForm();
+                                const tipoNome = editType === 'filmes' ? 'Filme' : editType === 'series' ? 'Série' : 'Anime';
+                                showToast(`${tipoNome} "${itemData.title}" atualizado com sucesso`);
+                            })
+                            .catch((error) => {
+                                console.error('Erro ao atualizar:', error);
+                                alert('Erro ao atualizar conteúdo');
+                            });
                     }
                 } else {
-                    const newContent = {
-                        id: getNextId(selectedContentType),
-                        ...itemData
-                    };
+                    const timestamp = Date.now();
+                    itemData.id = `${selectedContentType[0]}${timestamp}`;
+                    itemData.createdAt = timestamp;
 
-                    content[selectedContentType].push(newContent);
-                    saveContent();
-                    renderMovies();
-                    contentModal.classList.remove('active');
-                    resetAdminForm();
-                    const tipo = selectedContentType === 'filmes' ? 'Filme' : 
-                                 selectedContentType === 'series' ? 'Série' : 'Anime';
-                    showToast(`${tipo} "${itemData.title}" adicionado com sucesso`);
+                    saveContentToFirebase(selectedContentType, itemData)
+                        .then(() => {
+                            contentModal.classList.remove('active');
+                            resetAdminForm();
+                            const tipo = selectedContentType === 'filmes' ? 'Filme' : 
+                                         selectedContentType === 'series' ? 'Série' : 'Anime';
+                            showToast(`${tipo} "${itemData.title}" adicionado com sucesso`);
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao salvar:', error);
+                            alert('Erro ao adicionar conteúdo');
+                        });
                 }
             });
         }
@@ -2282,15 +2384,6 @@
             `).join('');
         }
 
-        function getNextId(type) {
-            if (content[type].length === 0) {
-                if (type === 'filmes') return 1;
-                if (type === 'series') return 101;
-                if (type === 'animes') return 201;
-            }
-            return Math.max(...content[type].map(item => item.id)) + 1;
-        }
-
         function resetAdminForm() {
             isEditMode = false;
             document.getElementById('adminContentForm').reset();
@@ -2311,12 +2404,19 @@
 
         window.addEventListener('load', () => {
             console.log('Aplicação iniciada');
+            console.log('Conectando ao Firebase Realtime Database...');
+            
             updateAuthArea();
             setupModal();
             setupLogoutModal();
             setupAdminPanel();
             loadFavorites();
-            renderMovies();
+            
+            // Inicializar conteúdo padrão se necessário
+            initializeDefaultContent();
+            
+            // Carregar conteúdo do Firebase
+            loadContentFromFirebase();
         });
     </script>
 </body>
