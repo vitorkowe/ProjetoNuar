@@ -259,29 +259,24 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                const q = query(collection(db, 'users'), where('uid', '==', user.uid));
-                const querySnapshot = await getDocs(q);
+                // Salvar dados do usuário no localStorage
+                localStorage.setItem('nuarLoggedUser', JSON.stringify({
+                    nome: email.split('@')[0],
+                    username: email.split('@')[0],
+                    email: email,
+                    uid: user.uid,
+                    avatar: null
+                }));
                 
-                if (!querySnapshot.empty) {
-                    const userData = querySnapshot.docs[0].data();
-                    localStorage.setItem('nuarLoggedUser', JSON.stringify({
-                        nome: userData.username,
-                        username: userData.username,
-                        email: userData.email,
-                        uid: user.uid,
-                        avatar: userData.avatar
+                if (rememberMe) {
+                    localStorage.setItem('nuarRememberUser', JSON.stringify({
+                        email: email,
+                        uid: user.uid
                     }));
-                    
-                    if (rememberMe) {
-                        localStorage.setItem('nuarRememberUser', JSON.stringify({
-                            email: email,
-                            uid: user.uid
-                        }));
-                    }
-                    
-                    showError(loginError, '✓ Login realizado!', true);
-                    setTimeout(() => window.location.href = '/inicio.html', 1000);
                 }
+                
+                showError(loginError, '✓ Login realizado!', true);
+                setTimeout(() => window.location.href = '/inicio.html', 1000);
             } catch (err) {
                 let errorMsg = 'Email ou senha incorretos';
                 if (err.code === 'auth/user-not-found') errorMsg = 'Usuário não encontrado';
