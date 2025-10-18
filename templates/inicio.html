@@ -1659,16 +1659,33 @@
         async function saveAvatarToFirebase(avatarBase64) {
     const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
     if (!loggedUser) return false;
+    
+    // Salvar o avatar com a chave do usuário
+    const userKey = loggedUser.uid || loggedUser.email || loggedUser.username;
+    localStorage.setItem(`nuarAvatar_${userKey}`, avatarBase64);
+    
+    // Também salvar no objeto do usuário
     loggedUser.avatar = avatarBase64;
     localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
+    
     return true;
 }
 
 async function loadUserDataFromFirebase() {
     const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-    if (!loggedUser || !loggedUser.avatar) return;
+    if (!loggedUser) return;
+    
+    // Tentar carregar avatar salvo anteriormente
+    const userKey = loggedUser.uid || loggedUser.email || loggedUser.username;
+    const savedAvatar = localStorage.getItem(`nuarAvatar_${userKey}`);
+    
+    if (savedAvatar) {
+        loggedUser.avatar = savedAvatar;
+        localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
+    }
+    
     const avatar = document.getElementById('userAvatar');
-    if (avatar) {
+    if (avatar && loggedUser.avatar) {
         avatar.style.backgroundImage = `url(${loggedUser.avatar})`;
         avatar.textContent = '';
     }
