@@ -13,7 +13,7 @@
         .decorative-shape { position: absolute; border-radius: 50%; opacity: 0.03; pointer-events: none; }
         .shape1 { width: 600px; height: 600px; background: linear-gradient(135deg, #8063e7, #5c45af); top: -300px; right: -200px; }
         .shape2 { width: 400px; height: 400px; background: linear-gradient(135deg, #7c35ec, #5c45af); bottom: -200px; left: -100px; }
-        .auth-container { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 60px 50px; width: 100%; max-width: 480px; position: relative; z-index: 10; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+        .auth-container { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 60px 50px; width: 100%; max-width: 480px; position: relative; z-index: 10; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; }
         .logo { display: flex; justify-content: center; margin-bottom: 40px; }
         .logo img { height: 50px; filter: drop-shadow(0 0 10px rgba(91, 72, 212, 0.5)); }
         .auth-header { text-align: center; margin-bottom: 40px; }
@@ -47,6 +47,7 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .page-transition { animation: fadeInUp 0.6s ease-out; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
         .hidden { display: none; }
         .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
         .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #8063e7; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -299,11 +300,26 @@
                 // Limpar flag de carregamento (sucesso!)
                 clearLoadFlag();
                 
-                // Esconder loading e mostrar formulário
+                console.log('🎨 Preparando transição visual...');
+                
+                // Esconder loading e mostrar formulário com delay para garantir renderização
                 setTimeout(() => {
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                    document.getElementById('loginPage').classList.remove('hidden');
-                }, 500);
+                    const loadingEl = document.getElementById('loadingOverlay');
+                    const loginEl = document.getElementById('loginPage');
+                    
+                    console.log('🔄 Escondendo loading overlay...');
+                    loadingEl.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        loadingEl.style.display = 'none';
+                        console.log('✅ Loading escondido');
+                        
+                        console.log('🔄 Mostrando formulário de login...');
+                        loginEl.classList.remove('hidden');
+                        loginEl.style.display = 'flex';
+                        console.log('✅ Formulário visível');
+                    }, 300);
+                }, 800);
                 
                 // Configurar tudo (só uma vez)
                 setupApp();
