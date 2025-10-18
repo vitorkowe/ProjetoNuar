@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuar - Início</title>
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='35' fill='%238B5CF6'/%3E%3Ccircle cx='60' cy='45' r='28' fill='%23ffffff'/%3E%3C/svg%3E">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="https://i.ibb.co/DDyKRKY6/nuarrr.png" sizes="32x32">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -16,6 +16,610 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     
     <style>
+
+body {
+    zoom: 0.9;
+}
+
+.episodes-section {
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(128, 99, 231, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(128, 99, 231, 0.3);
+    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.episodes-section h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.season-selector-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.season-scroll-btn {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.season-scroll-btn:hover {
+    background: rgba(128, 99, 231, 0.2);
+    border-color: rgba(128, 99, 231, 0.5);
+    transform: scale(1.1);
+}
+
+.season-scroll-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.season-selector {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 2px 0;
+    flex: 1;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.season-selector::-webkit-scrollbar {
+    display: none;
+}
+
+.season-btn {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.season-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-color: rgba(128, 99, 231, 0.3);
+}
+
+.season-btn.active {
+    background: linear-gradient(135deg, #5c45af, #7c35ec);
+    border-color: #8063e7;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(128, 99, 231, 0.4);
+}
+
+.episodes-grid-wrapper {
+    position: relative;
+    margin-bottom: 8px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.episodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: 5px;
+    height: 100%;
+    overflow-y: auto;
+    padding: 6px 3px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.episodes-grid::-webkit-scrollbar {
+    width: 5px;
+}
+
+.episodes-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.episodes-grid::-webkit-scrollbar-thumb {
+    background: rgba(128, 99, 231, 0.5);
+    border-radius: 10px;
+}
+
+.episodes-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(128, 99, 231, 0.7);
+}
+
+.episode-btn {
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 35px;
+}
+
+.episode-btn:hover {
+    background: rgba(128, 99, 231, 0.2);
+    border-color: rgba(128, 99, 231, 0.5);
+    transform: scale(1.05);
+    color: #fff;
+}
+
+.episode-btn.watched {
+    background: linear-gradient(135deg, #5c45af, #7c35ec);
+    border-color: #8063e7;
+    color: #fff;
+}
+
+.episode-btn.current {
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.6);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.3);
+    }
+}
+
+.episode-number {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Sistema de Conquistas estilo PSN */
+.achievement-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 20000;
+    pointer-events: none;
+}
+
+.achievement-notification {
+    background: linear-gradient(135deg, rgba(17, 14, 37, 0.98), rgba(26, 20, 65, 0.98));
+    border: 2px solid rgba(128, 99, 231, 0.6);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    min-width: 320px;
+    max-width: 380px;
+    box-shadow: 0 10px 40px rgba(128, 99, 231, 0.4), 0 0 80px rgba(124, 53, 236, 0.3);
+    backdrop-filter: blur(20px);
+    transform: translateX(500px);
+    opacity: 0;
+    animation: slideInAchievement 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+               slideOutAchievement 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 4.5s forwards;
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-notification::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #5c45af, #7c35ec, #a855f7, #7c35ec, #5c45af);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+}
+
+@keyframes slideInAchievement {
+    0% {
+        transform: translateX(500px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutAchievement {
+    0% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(500px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.achievement-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.achievement-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #5c45af, #7c35ec);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(128, 99, 231, 0.5);
+    animation: pulseIcon 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulseIcon {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(128, 99, 231, 0.5);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(128, 99, 231, 0.8);
+    }
+}
+
+.achievement-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+}
+
+.achievement-header-text {
+    flex: 1;
+}
+
+.achievement-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 3px;
+}
+
+.achievement-type {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.achievement-rarity {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(168, 85, 247, 0.3);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.achievement-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.achievement-poster {
+    width: 50px;
+    height: 70px;
+    border-radius: 5px;
+    object-fit: cover;
+    border: 2px solid rgba(128, 99, 231, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    flex-shrink: 0;
+}
+
+.achievement-content {
+    flex: 1;
+}
+
+.achievement-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+
+.achievement-message {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+}
+
+.achievement-trophy {
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 100px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.achievement-trophy svg {
+    width: 100%;
+    height: 100%;
+    fill: #8063e7;
+    animation: rotateTrophy 20s linear infinite;
+}
+
+@keyframes rotateTrophy {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Efeito sonoro visual */
+.achievement-notification.show {
+    animation: slideInAchievement 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+               achievementShake 0.3s ease 0.6s,
+               slideOutAchievement 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 4.5s forwards;
+}
+
+@keyframes achievementShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Partículas de celebração */
+.achievement-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #a855f7;
+    border-radius: 50%;
+    animation: particleFall 2s ease-out forwards;
+}
+
+@keyframes particleFall {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100px) rotate(360deg);
+    }
+}
+
+.watched-icon {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    font-size: 8px;
+    width: 13px;
+    height: 13px;
+    background: #22c55e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(34, 197, 94, 0.4);
+}
+
+/* Footer da seção de episódios */
+.episode-info-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.episode-info-text {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    flex: 1;
+}
+
+.mark-all-btn {
+    padding: 6px 12px;
+    background: rgba(128, 99, 231, 0.2);
+    border: 2px solid rgba(128, 99, 231, 0.5);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.mark-all-btn:hover {
+    background: linear-gradient(135deg, #5c45af, #7c35ec);
+    border-color: #8063e7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(128, 99, 231, 0.4);
+}
+
+.add-season-btn {
+    padding: 6px 12px;
+    background: rgba(34, 197, 94, 0.2);
+    border: 2px solid rgba(34, 197, 94, 0.5);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.add-season-btn:hover {
+    background: rgba(34, 197, 94, 0.3);
+    border-color: #22c55e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+}
+
+.progress-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(128, 99, 231, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(128, 99, 231, 0.3);
+    flex-wrap: wrap;
+}
+
+.progress-controls h3 {
+    width: 100%;
+    font-size: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progress-btn {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px 16px;
+    background: rgba(128, 99, 231, 0.2);
+    border: 2px solid rgba(128, 99, 231, 0.5);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.progress-btn:hover {
+    background: rgba(128, 99, 231, 0.3);
+    transform: translateY(-2px);
+}
+
+.progress-btn.active {
+    background: linear-gradient(135deg, #5c45af, #7c35ec);
+    border-color: #8063e7;
+}
+
+.movies-grid.drag-over {
+    background: rgba(128, 99, 231, 0.15);
+    border: 2px dashed rgba(128, 99, 231, 0.8);
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.movie-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.drop-zone-indicator {
+    display: none;
+    padding: 20px;
+    background: rgba(128, 99, 231, 0.1);
+    border: 2px dashed rgba(128, 99, 231, 0.5);
+    border-radius: 12px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.drop-zone-indicator.show {
+    display: block;
+}
+
+.admin-mode-active .section-title {
+    cursor: help;
+    position: relative;
+}
+
+.admin-mode-active .section-title::after {
+    content: '📦 Solte aqui para mover';
+    position: absolute;
+    left: 0;
+    bottom: -25px;
+    font-size: 12px;
+    color: rgba(128, 99, 231, 0.8);
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.admin-mode-active .movies-grid.drag-over + * .section-title::after {
+    opacity: 1;
+}
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -498,6 +1102,104 @@
             font-weight: 600;
         }
 
+        .continue-watching-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .continue-watching-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            height: 160px;
+        }
+
+        .continue-watching-card:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .continue-watching-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+
+        .continue-watching-card:hover .continue-watching-thumbnail {
+            opacity: 0.7;
+        }
+
+        .continue-watching-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);
+            padding: 40px 15px 12px;
+            z-index: 2;
+        }
+
+        .continue-watching-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .continue-watching-progress-container {
+            position: relative;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .continue-watching-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8063e7, #a855f7);
+            border-radius: 2px;
+            transition: width 0.3s;
+            box-shadow: 0 0 8px rgba(128, 99, 231, 0.8);
+        }
+
+        .continue-watching-play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 3;
+        }
+
+        .continue-watching-card:hover .continue-watching-play-icon {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .continue-watching-play-icon::after {
+            content: '▶';
+            color: #5c45af;
+            font-size: 20px;
+            margin-left: 3px;
+        }
+
         .movies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -700,6 +1402,43 @@
             margin-right: 10px;
         }
 
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 6;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5c45af, #7c35ec);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(124, 53, 236, 0.6);
+        }
+
+        .progress-text {
+            position: absolute;
+            bottom: 50px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 5;
+            opacity: 0;
+            transition: all 0.3s;
+            border: 1px solid rgba(128, 99, 231, 0.3);
+        }
+
+        .movie-card:hover .progress-text {
+            opacity: 1;
+        }
+
         .video-modal {
             position: fixed;
             inset: 0;
@@ -847,6 +1586,20 @@
             display: inline-block;
             overflow: hidden;
         }
+
+        .add-episode-btn {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border: 1px dashed rgba(34, 197, 94, 0.5) !important;
+    color: #22c55e !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+.add-episode-btn:hover {
+    background: rgba(34, 197, 94, 0.3) !important;
+    border-color: #22c55e !important;
+    transform: scale(1.1) !important;
+}
 
         .star::before {
             content: '★';
@@ -1443,7 +2196,12 @@
     </div>
 
     <div class="container">
-        <h2 class="section-title">Destaques do Momento</h2>
+        <div id="continueWatchingSection" style="display: none; margin-bottom: 50px;">
+            <h2 class="section-title">Continue Assistindo</h2>
+            <div class="continue-watching-grid" id="continueWatchingGrid"></div>
+        </div>
+
+        <h2 class="section-title">Filmes do Momento</h2>
         <div class="movies-grid" id="moviesGrid"><div class="loading">Carregando filmes...</div></div>
 
         <h2 class="section-title">Séries Populares</h2>
@@ -1521,13 +2279,17 @@
             <h3 class="admin-login-title">Painel Admin</h3>
             <form id="adminLoginForm">
                 <div class="admin-input-group">
+                    <label>Email Admin</label>
+                    <input type="email" id="adminEmail" class="admin-input" placeholder="admin@nuar.com" required>
+                </div>
+                <div class="admin-input-group">
                     <label>Senha Admin</label>
                     <input type="password" id="adminPassword" class="admin-input" placeholder="Digite a senha" required>
-                    <div class="admin-error" id="adminError">Senha incorreta!</div>
+                    <div class="admin-error" id="adminError">Credenciais incorretas!</div>
                 </div>
                 <div class="modal-buttons">
                     <button type="button" class="modal-btn modal-btn-secondary" id="cancelAdminLogin">Cancelar</button>
-                    <button type="submit" class="modal-btn modal-btn-primary">Entrar</button>
+                    <button type="submit" class="modal-btn modal-btn-primary" id="adminLoginBtn">Entrar</button>
                 </div>
             </form>
         </div>
@@ -1556,13 +2318,13 @@
                     <label>Ano</label>
                     <input type="number" id="contentYear" class="admin-form-input" placeholder="Ex: 2024" required>
                 </div>
+                <div class="admin-form-group" id="durationField">
+                    <label id="durationLabel">Duração</label>
+                    <input type="text" id="contentDuration" class="admin-form-input" placeholder="Ex: 2h 30m" required>
+                </div>
                 <div class="admin-form-group">
                     <label>Nota (0-10)</label>
                     <input type="number" id="contentRating" class="admin-form-input" step="0.1" min="0" max="10" placeholder="Ex: 8.5" required>
-                </div>
-                <div class="admin-form-group">
-                    <label>Duração</label>
-                    <input type="text" id="contentDuration" class="admin-form-input" placeholder="Ex: 2h 30m" required>
                 </div>
                 <div class="admin-form-group">
                     <label>Gêneros</label>
@@ -1593,6 +2355,13 @@
     <script>
         let database;
         let auth;
+        let episodesData = {};
+        let currentEpisodeData = {
+    itemId: null,
+    season: 1,
+    episode: 1
+};
+let episodesPerSeason = {}; // Armazena quantidade de episódios por temporada
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHlEtmKXGeAsY9Ih-BBP-yiGrKJIKRD9k",
@@ -1617,8 +2386,271 @@
         let adminGenres = [];
         let selectedContentType = 'filmes';
         let isEditMode = false;
-        const ADMIN_PASSWORD = 'nuaradm';
         let content = { filmes: [], series: [], animes: [] };
+        let watchingProgress = {};
+        let customSeasons = {}; 
+        let achievementsUnlocked = {};
+
+        function saveCustomSeasons() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    localStorage.setItem(`nuarCustomSeasons_${loggedUser.email || loggedUser.username}`, JSON.stringify(customSeasons));
+}
+
+function loadCustomSeasons() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    const saved = localStorage.getItem(`nuarCustomSeasons_${loggedUser.email || loggedUser.username}`);
+    if (saved) {
+        customSeasons = JSON.parse(saved);
+    }
+}
+
+function loadAchievements() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    
+    const saved = localStorage.getItem(`nuarAchievements_${loggedUser.email || loggedUser.username}`);
+    if (saved) {
+        achievementsUnlocked = JSON.parse(saved);
+    }
+}
+
+// Salvar conquistas
+function saveAchievements() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    
+    localStorage.setItem(`nuarAchievements_${loggedUser.email || loggedUser.username}`, JSON.stringify(achievementsUnlocked));
+}
+
+// Verificar se conquista já foi desbloqueada
+function hasAchievement(key) {
+    return achievementsUnlocked[key] === true;
+}
+
+// Criar container de conquistas se não existir
+function ensureAchievementContainer() {
+    let container = document.getElementById('achievementContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'achievementContainer';
+        container.className = 'achievement-container';
+        document.body.appendChild(container);
+    }
+    return container;
+}
+
+// Mostrar conquista
+function showAchievement(data) {
+    const container = ensureAchievementContainer();
+    
+    const notification = document.createElement('div');
+    notification.className = 'achievement-notification show';
+    
+    // Criar partículas
+    const particles = document.createElement('div');
+    particles.className = 'achievement-particles';
+    for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.animationDelay = `${Math.random() * 0.5}s`;
+        particles.appendChild(particle);
+    }
+    
+    notification.innerHTML = `
+        <div class="achievement-header">
+            <div class="achievement-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19.82 2H4.18C2.97 2 2 2.97 2 4.18v15.64C2 21.03 2.97 22 4.18 22h15.64c1.21 0 2.18-.97 2.18-2.18V4.18C22 2.97 21.03 2 19.82 2zM7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 7h5M17 17h5"/>
+                </svg>
+            </div>
+            <div class="achievement-header-text">
+                <div class="achievement-title">Conquista Desbloqueada</div>
+                <div class="achievement-type">
+                    ${data.type}
+                    <span class="achievement-rarity">${data.rarity || 'Raro'}</span>
+                </div>
+            </div>
+        </div>
+        <div class="achievement-body">
+            ${data.poster ? `<img src="${data.poster}" class="achievement-poster" alt="${data.name}">` : ''}
+            <div class="achievement-content">
+                <div class="achievement-name">${data.name}</div>
+                <div class="achievement-message">${data.message}</div>
+            </div>
+        </div>
+        <div class="achievement-trophy">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 15c3.87 0 7-3.13 7-7V3H5v5c0 3.87 3.13 7 7 7zm0 0v7m-5 0h10m-5-7c-1.66 0-3-1.34-3-3V6h6v6c0 1.66-1.34 3-3 3z"/>
+            </svg>
+        </div>
+    `;
+    
+    notification.appendChild(particles);
+    container.appendChild(notification);
+    
+    // Tocar som (opcional)
+    playAchievementSound();
+    
+    // Remover após animação
+    setTimeout(() => {
+        notification.remove();
+    }, 5500);
+}
+
+// Som de conquista (opcional - usando Web Audio API)
+function playAchievementSound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+    } catch (e) {
+        // Navegador não suporta Web Audio API
+    }
+}
+
+// Verificar conquista de filme completo
+function checkMovieCompletion(itemId) {
+    const progressData = watchingProgress[itemId];
+    if (!progressData || progressData.progress < 100) return;
+    
+    const achievementKey = `movie_${itemId}`;
+    if (hasAchievement(achievementKey)) return;
+    
+    const allContent = [...content.filmes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    if (!item) return;
+    
+    achievementsUnlocked[achievementKey] = true;
+    saveAchievements();
+    
+    showAchievement({
+        type: '🎬 Filme Completo',
+        name: item.title,
+        message: `Parabéns por terminar ${item.title}!`,
+        poster: item.imageUrl,
+        rarity: 'Épico'
+    });
+}
+
+// Verificar conquista de temporada completa
+function checkSeasonCompletion(itemId, season) {
+    const totalEpisodes = getEpisodeCount(itemId, season);
+    const watchedEpisodes = episodesData[itemId]?.[season]?.length || 0;
+    
+    if (watchedEpisodes < totalEpisodes) return;
+    
+    const achievementKey = `season_${itemId}_S${season}`;
+    if (hasAchievement(achievementKey)) return;
+    
+    const allContent = [...content.series, ...content.animes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    if (!item) return;
+    
+    achievementsUnlocked[achievementKey] = true;
+    saveAchievements();
+    
+    const type = content.series.find(s => (s.firebaseKey || s.id) === itemId) ? 'série' : 'anime';
+    
+    showAchievement({
+        type: '📺 Temporada Completa',
+        name: `${item.title} - Temporada ${season}`,
+        message: `Parabéns por terminar uma temporada de ${item.title}!`,
+        poster: item.imageUrl,
+        rarity: 'Raro'
+    });
+}
+
+// Verificar conquista de série/anime completo
+function checkSeriesCompletion(itemId) {
+    const allContent = [...content.series, ...content.animes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    if (!item) return;
+    
+    const baseSeasons = parseInt(item.duration.match(/(\d+)\s*temporada/i)?.[1] || 1);
+    const customCount = customSeasons[itemId] || 0;
+    const totalSeasons = baseSeasons + customCount;
+    
+    // Verificar se todas as temporadas foram completadas
+    for (let s = 1; s <= totalSeasons; s++) {
+        const totalEpisodes = getEpisodeCount(itemId, s);
+        const watchedEpisodes = episodesData[itemId]?.[s]?.length || 0;
+        if (watchedEpisodes < totalEpisodes) return;
+    }
+    
+    const achievementKey = `complete_${itemId}`;
+    if (hasAchievement(achievementKey)) return;
+    
+    achievementsUnlocked[achievementKey] = true;
+    saveAchievements();
+    
+    const type = content.series.find(s => (s.firebaseKey || s.id) === itemId) ? 'série' : 'anime';
+    
+    showAchievement({
+        type: `🏆 ${type.charAt(0).toUpperCase() + type.slice(1)} Completa`,
+        name: item.title,
+        message: `Parabéns por terminar ${item.title} completamente!`,
+        poster: item.imageUrl,
+        rarity: 'Lendário'
+    });
+}
+
+// Salvar episódios por temporada
+function saveEpisodesPerSeason() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    localStorage.setItem(`nuarEpisodesPerSeason_${loggedUser.email || loggedUser.username}`, JSON.stringify(episodesPerSeason));
+}
+
+function loadEpisodesPerSeason() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    const saved = localStorage.getItem(`nuarEpisodesPerSeason_${loggedUser.email || loggedUser.username}`);
+    if (saved) {
+        episodesPerSeason = JSON.parse(saved);
+    }
+}
+
+// Obter quantidade de episódios de uma temporada
+function getEpisodeCount(itemId, season) {
+    const key = `${itemId}_S${season}`;
+    if (episodesPerSeason[key]) {
+        return episodesPerSeason[key];
+    }
+    // Padrão: 3 episódios para TODAS as temporadas
+    return 3;
+}
+
+function initializeSeasonEpisodes(itemId, totalSeasons) {
+    for (let s = 1; s <= totalSeasons; s++) {
+        const key = `${itemId}_S${s}`;
+        if (!episodesPerSeason[key]) {
+            episodesPerSeason[key] = 3; // Começa com 3
+        }
+    }
+    saveEpisodesPerSeason();
+}
+
+// Definir quantidade de episódios de uma temporada
+function setEpisodeCount(itemId, season, count) {
+    const key = `${itemId}_S${season}`;
+    episodesPerSeason[key] = count;
+    saveEpisodesPerSeason();
+}
 
         function checkAuthState() {
             return new Promise((resolve) => {
@@ -1656,41 +2688,54 @@
             });
         }
 
-        // ===== PASSO 4: ATUALIZAR saveAvatarToFirebase =====
-        async function saveAvatarToFirebase(avatarBase64) {
-    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-    if (!loggedUser) return false;
-    
-    // Salvar o avatar com a chave do usuário
-    const userKey = loggedUser.uid || loggedUser.email || loggedUser.username;
-    localStorage.setItem(`nuarAvatar_${userKey}`, avatarBase64);
-    
-    // Também salvar no objeto do usuário
-    loggedUser.avatar = avatarBase64;
-    localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
-    
-    return true;
-}
+        async function syncLocalStorageWithFirebase() {
+            const loggedUser = localStorage.getItem('nuarLoggedUser');
+            
+            if (loggedUser) {
+                try {
+                    const user = JSON.parse(loggedUser);
+                    
+                    if (user.email && user.tempPassword) {
+                        await auth.signInWithEmailAndPassword(user.email, user.tempPassword);
+                        console.log('✅ Usuário autenticado automaticamente');
+                    }
+                } catch (error) {
+                    console.log('ℹ️ Não foi possível autenticar automaticamente:', error.message);
+                }
+            }
+        }
 
-async function loadUserDataFromFirebase() {
-    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-    if (!loggedUser) return;
-    
-    // Tentar carregar avatar salvo anteriormente
-    const userKey = loggedUser.uid || loggedUser.email || loggedUser.username;
-    const savedAvatar = localStorage.getItem(`nuarAvatar_${userKey}`);
-    
-    if (savedAvatar) {
-        loggedUser.avatar = savedAvatar;
-        localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
-    }
-    
-    const avatar = document.getElementById('userAvatar');
-    if (avatar && loggedUser.avatar) {
-        avatar.style.backgroundImage = `url(${loggedUser.avatar})`;
-        avatar.textContent = '';
-    }
-}
+        async function saveAvatarToFirebase(avatarBase64) {
+            const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+            if (!loggedUser) return false;
+            
+            const userKey = loggedUser.uid || loggedUser.email || loggedUser.username;
+            localStorage.setItem(`nuarAvatar_${userKey}`, avatarBase64);
+            
+            loggedUser.avatar = avatarBase64;
+            localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
+            
+            return true;
+        }
+
+        async function loadUserDataFromFirebase() {
+            const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+            if (!loggedUser) return;
+            
+            const userKey = loggedUser.uid || loggedUser.email || loggedUser.username;
+            const savedAvatar = localStorage.getItem(`nuarAvatar_${userKey}`);
+            
+            if (savedAvatar) {
+                loggedUser.avatar = savedAvatar;
+                localStorage.setItem('nuarLoggedUser', JSON.stringify(loggedUser));
+            }
+            
+            const avatar = document.getElementById('userAvatar');
+            if (avatar && loggedUser.avatar) {
+                avatar.style.backgroundImage = `url(${loggedUser.avatar})`;
+                avatar.textContent = '';
+            }
+        }
 
         function loadContentFromFirebase() {
             console.log('Carregando conteúdo do Firebase...');
@@ -1786,15 +2831,31 @@ async function loadUserDataFromFirebase() {
         }
 
         function loadFavorites() {
-            const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
-            if (!loggedUser) return;
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    
+    const savedFavorites = localStorage.getItem(`nuarFavorites_${loggedUser.email || loggedUser.username}`);
+    if (savedFavorites) {
+        const favArray = JSON.parse(savedFavorites);
+        userFavorites = new Set(favArray);
+    }
 
-            const savedFavorites = localStorage.getItem(`nuarFavorites_${loggedUser.email || loggedUser.username}`);
-            if (savedFavorites) {
-                const favArray = JSON.parse(savedFavorites);
-                userFavorites = new Set(favArray);
-            }
-        }
+    const savedProgress = localStorage.getItem(`nuarProgress_${loggedUser.email || loggedUser.username}`);
+    if (savedProgress) {
+        watchingProgress = JSON.parse(savedProgress);
+    }
+
+    const savedEpisodes = localStorage.getItem(`nuarEpisodes_${loggedUser.email || loggedUser.username}`);
+    if (savedEpisodes) {
+        episodesData = JSON.parse(savedEpisodes);
+    }
+    
+    loadCustomSeasons();
+    loadEpisodesPerSeason();
+    loadCustomSeasons();
+    loadEpisodesPerSeason();
+    loadAchievements(); 
+}
 
         function saveFavorites() {
             const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
@@ -1803,6 +2864,227 @@ async function loadUserDataFromFirebase() {
             const favArray = Array.from(userFavorites);
             localStorage.setItem(`nuarFavorites_${loggedUser.email || loggedUser.username}`, JSON.stringify(favArray));
         }
+
+        function saveWatchingProgress(itemId, progress, type, episode = null, season = null) {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+
+    watchingProgress[itemId] = {
+        progress: progress,
+        type: type,
+        lastWatched: Date.now(),
+        episode: episode,    // ADICIONE
+        season: season       // ADICIONE
+    };
+
+    localStorage.setItem(`nuarProgress_${loggedUser.email || loggedUser.username}`, JSON.stringify(watchingProgress));
+    renderContinueWatching();
+}
+
+function saveEpisodesData() {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) return;
+    localStorage.setItem(`nuarEpisodes_${loggedUser.email || loggedUser.username}`, JSON.stringify(episodesData));
+}
+
+function markEpisodeWatched(itemId, season, episode) {
+    if (!episodesData[itemId]) episodesData[itemId] = {};
+    if (!episodesData[itemId][season]) episodesData[itemId][season] = [];
+    
+    if (!episodesData[itemId][season].includes(episode)) {
+        episodesData[itemId][season].push(episode);
+    }
+    
+    saveEpisodesData();
+    
+    // Atualiza progresso baseado em episódios assistidos
+    const allContent = [...content.filmes, ...content.series, ...content.animes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    if (item) {
+        const totalEpisodes = getTotalEpisodes(itemId);
+        const watchedEpisodes = getWatchedEpisodesCount(itemId);
+        const progress = Math.min(100, (watchedEpisodes / totalEpisodes) * 100);
+        
+        let type = 'series';
+        if (content.animes.find(a => (a.firebaseKey || a.id) === itemId)) type = 'animes';
+        
+        saveWatchingProgress(itemId, progress, type, episode, season);
+        setTimeout(() => {
+            checkSeasonCompletion(itemId, season);
+            checkSeriesCompletion(itemId);
+        }, 500);
+    }
+}
+
+function isEpisodeWatched(itemId, season, episode) {
+    return episodesData[itemId]?.[season]?.includes(episode) || false;
+}
+
+function getWatchedEpisodesCount(itemId) {
+    if (!episodesData[itemId]) return 0;
+    let count = 0;
+    Object.values(episodesData[itemId]).forEach(seasonEps => {
+        count += seasonEps.length;
+    });
+    return count;
+}
+
+function getTotalEpisodes(itemId) {
+    const allContent = [...content.series, ...content.animes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    if (!item) return 12;
+    
+    const baseSeasons = parseInt(item.duration.match(/(\d+)\s*temporada/i)?.[1] || 1);
+    const customCount = customSeasons[itemId] || 0;
+    const totalSeasons = baseSeasons + customCount;
+    
+    let total = 0;
+    for (let s = 1; s <= totalSeasons; s++) {
+        total += getEpisodeCount(itemId, s);
+    }
+    
+    return total;
+}
+
+        function getWatchingProgress(itemId) {
+            return watchingProgress[itemId] || null;
+        }
+
+        function renderContinueWatching() {
+    const section = document.getElementById('continueWatchingSection');
+    const grid = document.getElementById('continueWatchingGrid');
+    
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) {
+        section.style.display = 'none';
+        return;
+    }
+    
+    const progressItems = Object.entries(watchingProgress)
+        .filter(([_, data]) => data.progress > 0 && data.progress < 100)
+        .sort((a, b) => b[1].lastWatched - a[1].lastWatched)
+        .slice(0, 6);
+
+    if (progressItems.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    
+    const allContent = [...content.filmes, ...content.series, ...content.animes];
+    
+    grid.innerHTML = progressItems.map(([itemId, data]) => {
+        const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+        if (!item) return '';
+        
+        // ADICIONE INFO DE EPISÓDIO
+        let episodeInfo = '';
+        if (data.episode && data.season) {
+            episodeInfo = `<div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 4px;">T${data.season} E${data.episode}</div>`;
+        }
+        
+        return `
+            <div class="continue-watching-card" onclick="openModal('${itemId}')">
+                <img src="${item.imageUrl}" alt="${item.title}" class="continue-watching-thumbnail">
+                <div class="continue-watching-play-icon"></div>
+                <div class="continue-watching-overlay">
+                    <div class="continue-watching-title">${item.title}</div>
+                    ${episodeInfo}
+                    <div class="continue-watching-progress-container">
+                        <div class="continue-watching-progress-bar" style="width: ${data.progress}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderEpisodesSection(itemId, type) {
+    if (type !== 'series' && type !== 'animes') return '';
+    
+    const allContent = [...content.series, ...content.animes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    if (!item) return '';
+    
+    const baseSeasons = parseInt(item.duration.match(/(\d+)\s*temporada/i)?.[1] || 1);
+    const customCount = customSeasons[itemId] || 0;
+    const totalSeasons = baseSeasons + customCount;
+    
+    // ADICIONE ESTA LINHA
+    initializeSeasonEpisodes(itemId, totalSeasons);
+    
+    let seasonsHTML = '';
+    for (let i = 1; i <= totalSeasons; i++) {
+        seasonsHTML += `<button class="season-btn ${i === 1 ? 'active' : ''}" onclick="showSeason(${i}, '${itemId}')">${i}ª Temporada</button>`;
+    }
+    
+    return `
+        <div class="episodes-section">
+            <h3>📺 Episódios</h3>
+            <div class="season-selector-wrapper">
+                <button class="season-scroll-btn" onclick="scrollSeasons('left', '${itemId}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="season-selector" id="seasonSelector_${itemId}">
+                    ${seasonsHTML}
+                </div>
+                <button class="season-scroll-btn" onclick="scrollSeasons('right', '${itemId}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="episodes-grid-wrapper">
+                <div class="episodes-grid" id="episodesGrid">
+                    ${renderEpisodes(1, itemId)}
+                </div>
+            </div>
+            <div class="episode-info-footer">
+                <div class="episode-info-text">Clique no episódio para marcar como assistido</div>
+                <button class="add-season-btn" onclick="addNewSeason('${itemId}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Adicionar Temporada
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function renderEpisodes(season, itemId) {
+    const episodeCount = getEpisodeCount(itemId, season);
+    let html = '';
+    
+    for (let ep = 1; ep <= episodeCount; ep++) {
+        const watched = isEpisodeWatched(itemId, season, ep);
+        const progressData = watchingProgress[itemId];
+        const isCurrent = progressData?.season === season && progressData?.episode === ep;
+        
+        html += `
+            <button class="episode-btn ${watched ? 'watched' : ''} ${isCurrent ? 'current' : ''}" 
+                    onclick="toggleEpisode(event, '${itemId}', ${season}, ${ep})">
+                ${ep}
+            </button>
+        `;
+    }
+    
+    // Adicionar botão + após o último episódio
+    html += `
+        <button class="episode-btn add-episode-btn" 
+                onclick="addEpisodeToSeason(event, '${itemId}', ${season})"
+                title="Adicionar episódio">
+            +
+        </button>
+    `;
+    
+    return html;
+}
+
 
         function getInitials(name) {
             const names = name.trim().split(' ');
@@ -1830,6 +3112,14 @@ async function loadUserDataFromFirebase() {
                                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                                 </svg>
                                 <div>Meus Favoritos</div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" id="conquestasBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 15c3.87 0 7-3.13 7-7V3H5v5c0 3.87 3.13 7 7 7z"/>
+                                    <path d="M12 15v7m-5 0h10m-5-7c-1.66 0-3-1.34-3-3V6h6v6c0 1.66-1.34 3-3 3z"/>
+                                </svg>
+                                <div>Minhas Conquistas</div>
                             </div>
                             <div class="dropdown-divider"></div>
                             <div class="dropdown-item" id="changeAvatarBtn">
@@ -1869,6 +3159,49 @@ async function loadUserDataFromFirebase() {
                 document.getElementById('favoritosBtn').addEventListener('click', () => {
                     window.location.href = '/favoritos.html';
                 });
+
+                document.getElementById('conquestasBtn').addEventListener('click', () => { 
+                    window.location.href = '/conquistas.html'; 
+                });
+
+                window.toggleEpisode = function(event, itemId, season, episode) {
+    event.stopPropagation();
+    
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) {
+        alert('Você precisa estar logado!');
+        return;
+    }
+    
+    const btn = event.currentTarget;
+    const isWatched = btn.classList.contains('watched');
+    
+    if (isWatched) {
+        // Desmarcar episódio
+        if (episodesData[itemId] && episodesData[itemId][season]) {
+            episodesData[itemId][season] = episodesData[itemId][season].filter(ep => ep !== episode);
+        }
+        btn.classList.remove('watched');
+        showToast(`Episódio ${episode} desmarcado`);
+    } else {
+        // Marcar episódio como assistido
+        markEpisodeWatched(itemId, season, episode);
+        btn.classList.add('watched');
+        showToast(`Episódio ${episode} assistido ✓`);
+    }
+    
+    saveEpisodesData();
+    renderContinueWatching();
+    renderMovies();
+}
+
+window.showSeason = function(season, itemId) {
+    document.querySelectorAll('.season-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const grid = document.getElementById('episodesGrid');
+    grid.innerHTML = renderEpisodes(season, itemId);
+}
 
                 document.getElementById('changeAvatarBtn').addEventListener('click', () => {
                     dropdown.classList.remove('active');
@@ -2098,34 +3431,155 @@ async function loadUserDataFromFirebase() {
         });
 
         function renderMovies() {
+            const adminUser = auth.currentUser;
+            const isAdmin = adminUser && adminUser.email === 'admin@nuar.com';
+            
             const moviesGrid = document.getElementById('moviesGrid');
             const seriesGrid = document.getElementById('seriesGrid');
             const animesGrid = document.getElementById('animesGrid');
+
+            if (isAdmin) {
+                document.body.classList.add('admin-mode-active');
+            } else {
+                document.body.classList.remove('admin-mode-active');
+            }
 
             if (moviesGrid) {
                 moviesGrid.innerHTML = content.filmes.length > 0 
                     ? content.filmes.map(m => createMovieCard(m, 'filmes')).join('')
                     : '<div class="loading">Nenhum filme encontrado</div>';
+                
+                if (isAdmin) setupDragAndDrop(moviesGrid, 'filmes');
             }
             if (seriesGrid) {
                 seriesGrid.innerHTML = content.series.length > 0 
                     ? content.series.map(m => createMovieCard(m, 'series')).join('')
                     : '<div class="loading">Nenhuma série encontrada</div>';
+                
+                if (isAdmin) setupDragAndDrop(seriesGrid, 'series');
             }
             if (animesGrid) {
                 animesGrid.innerHTML = content.animes.length > 0 
                     ? content.animes.map(m => createMovieCard(m, 'animes')).join('')
                     : '<div class="loading">Nenhum anime encontrado</div>';
+                
+                if (isAdmin) setupDragAndDrop(animesGrid, 'animes');
             }
+
+            renderContinueWatching();
+        }
+
+        function setupDragAndDrop(gridElement, gridType) {
+            const cards = gridElement.querySelectorAll('.movie-card');
+            cards.forEach(card => {
+                card.setAttribute('draggable', 'true');
+                
+                card.addEventListener('dragstart', (e) => {
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        itemId: card.dataset.itemId || card.onclick.toString().match(/'([^']+)'/)[1],
+                        sourceType: gridType
+                    }));
+                });
+                
+                card.addEventListener('dragend', (e) => {
+                    card.classList.remove('dragging');
+                });
+            });
+            
+            gridElement.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                gridElement.classList.add('drag-over');
+            });
+            
+            gridElement.addEventListener('dragleave', (e) => {
+                if (e.target === gridElement) {
+                    gridElement.classList.remove('drag-over');
+                }
+            });
+            
+            gridElement.addEventListener('drop', (e) => {
+                e.preventDefault();
+                gridElement.classList.remove('drag-over');
+                
+                try {
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    const { itemId, sourceType } = data;
+                    
+                    if (sourceType === gridType) {
+                        showToast('O item já está nesta categoria');
+                        return;
+                    }
+                    
+                    moveContentBetweenCategories(itemId, sourceType, gridType);
+                } catch (error) {
+                    console.error('Erro ao processar drop:', error);
+                }
+            });
+        }
+
+        function moveContentBetweenCategories(itemId, sourceType, targetType) {
+            const item = content[sourceType].find(i => (i.firebaseKey || i.id) === itemId);
+            
+            if (!item) {
+                alert(`❌ Erro: Item não encontrado!\n\nID: ${itemId}\nTipo origem: ${sourceType}`);
+                return;
+            }
+            
+            if (!item.firebaseKey) {
+                alert(`❌ Erro: Item sem chave do Firebase!\n\nTítulo: ${item.title}`);
+                return;
+            }
+            
+            const sourceTypeName = sourceType === 'filmes' ? 'Filmes' : 
+                                   sourceType === 'series' ? 'Séries' : 'Animes';
+            const targetTypeName = targetType === 'filmes' ? 'Filmes' : 
+                                   targetType === 'series' ? 'Séries' : 'Animes';
+            
+            if (!confirm(`🔄 Mover "${item.title}"?\n\nDe: ${sourceTypeName}\nPara: ${targetTypeName}\n\nDeseja continuar?`)) {
+                return;
+            }
+            
+            console.log(`🔄 Movendo "${item.title}" de "${sourceType}" para "${targetType}"...`);
+            
+            const itemData = {
+                id: item.id,
+                title: item.title,
+                year: item.year,
+                rating: item.rating,
+                duration: item.duration,
+                genres: item.genres,
+                description: item.description,
+                imageUrl: item.imageUrl,
+                videoUrl: item.videoUrl,
+                createdAt: item.createdAt || Date.now()
+            };
+            
+            deleteContentFromFirebase(sourceType, item.firebaseKey)
+                .then(() => {
+                    console.log('✅ Item removido da categoria antiga');
+                    return saveContentToFirebase(targetType, itemData);
+                })
+                .then(() => {
+                    console.log('✅ Item adicionado à nova categoria');
+                    showToast(`"${item.title}" movido para ${targetTypeName} com sucesso! 🎉`);
+                })
+                .catch((error) => {
+                    console.error('❌ Erro ao mover:', error);
+                    alert(`❌ Erro ao mover conteúdo!\n\nDetalhes: ${error.message}\n\nTente novamente ou use a função de editar.`);
+                });
         }
 
         function createMovieCard(m, type) {
-            const isAdmin = sessionStorage.getItem('nuarAdminAuth') === 'true';
+            const adminUser = auth.currentUser;
+            const isAdmin = adminUser && adminUser.email === 'admin@nuar.com';
             const genresText = m.genres.join(' • ');
             const itemId = m.firebaseKey || m.id;
             
             return `
-                <div class="movie-card" onclick="openModal('${itemId}')">
+                <div class="movie-card" data-item-id="${itemId}" onclick="openModal('${itemId}')">
                     <div class="movie-poster">
                         <img src="${m.imageUrl}" alt="${m.title}">
                         ${isAdmin ? `
@@ -2179,6 +3633,71 @@ async function loadUserDataFromFirebase() {
             `;
         }
 
+        function createMovieCardWithProgress(m, type, progress) {
+            const adminUser = auth.currentUser;
+            const isAdmin = adminUser && adminUser.email === 'admin@nuar.com';
+            const genresText = m.genres.join(' • ');
+            const itemId = m.firebaseKey || m.id;
+            
+            return `
+                <div class="movie-card" data-item-id="${itemId}" onclick="openModal('${itemId}')">
+                    <div class="movie-poster">
+                        <img src="${m.imageUrl}" alt="${m.title}">
+                        ${isAdmin ? `
+                        <button class="delete-btn show" 
+                                data-id="${itemId}" 
+                                onclick="deleteContent(event, '${itemId}', '${type}')">
+                            <svg viewBox="0 0 24 24" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                <line x1="14" y1="11" x2="14" y2="17"/>
+                            </svg>
+                        </button>
+                        <button class="edit-btn show" 
+                                data-id="${itemId}" 
+                                onclick="openEditModal(event, '${itemId}', '${type}')">
+                            <svg viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                        </button>
+                        ` : ''}
+                        <button class="favorite-btn ${userFavorites.has(itemId) ? 'favorited' : ''}" 
+                                data-id="${itemId}" 
+                                onclick="toggleFavorite(event, '${itemId}')">
+                            <svg viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
+                        <div class="progress-text">${Math.round(progress)}% assistido</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="genre-badge" title="${genresText}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 0 1 0 2.828l-7 7a2 2 0 0 1-2.828 0l-7-7A1.994 1.994 0 0 1 3 12V7a4 4 0 0 1 4-4z"/>
+                            </svg>
+                            ${genresText}
+                        </div>
+                        <div class="play-icon"></div>
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title">${m.title}</div>
+                        <div class="movie-meta">
+                            <span class="rating">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                                ${m.rating}
+                            </span>
+                            <span>${m.year}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function openEditModal(event, itemId, type) {
             event.stopPropagation();
             
@@ -2202,8 +3721,12 @@ async function loadUserDataFromFirebase() {
             document.getElementById('contentImage').value = item.imageUrl;
             document.getElementById('contentVideo').value = item.videoUrl;
 
-            document.getElementById('adminTabsContainer').style.display = 'none';
+            document.getElementById('adminTabsContainer').style.display = 'flex';
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.type === type);
+            });
 
+            toggleDurationField();
             updateGenresList();
             document.getElementById('adminContentModal').classList.add('active');
         }
@@ -2211,26 +3734,34 @@ async function loadUserDataFromFirebase() {
         function deleteContent(event, itemId, type) {
             event.stopPropagation();
             
-            if (sessionStorage.getItem('nuarAdminAuth') !== 'true') {
-                alert('Apenas administradores podem remover conteúdo');
+            const item = content[type].find(i => (i.firebaseKey || i.id) === itemId);
+            if (!item) {
+                alert(`❌ Item não encontrado!\n\nID: ${itemId}\nTipo: ${type}`);
+                console.error('❌ Item não encontrado para deletar:', { itemId, type });
                 return;
             }
 
-            const item = content[type].find(i => (i.firebaseKey || i.id) === itemId);
-            if (!item) return;
-
-            if (confirm(`Deseja realmente remover "${item.title}"?`)) {
+            if (confirm(`🗑️ Deseja realmente remover?\n\n"${item.title}"\n\nEsta ação não pode ser desfeita!`)) {
                 const firebaseKey = item.firebaseKey;
+                
+                if (!firebaseKey) {
+                    alert(`❌ Erro: Item sem chave do Firebase!\n\nTítulo: ${item.title}\n\nEste item não pode ser deletado.`);
+                    console.error('❌ Item sem firebaseKey:', item);
+                    return;
+                }
+                
+                console.log(`🗑️ Deletando item: "${item.title}" (${type})...`);
                 
                 deleteContentFromFirebase(type, firebaseKey)
                     .then(() => {
+                        console.log('✅ Item deletado com sucesso');
                         const tipoNome = type === 'filmes' ? 'Filme' : 
                                         type === 'series' ? 'Série' : 'Anime';
                         showToast(`${tipoNome} "${item.title}" removido com sucesso`);
                     })
                     .catch((error) => {
-                        console.error('Erro ao remover:', error);
-                        alert('Erro ao remover conteúdo');
+                        console.error('❌ Erro ao remover:', error);
+                        alert(`❌ Erro ao remover conteúdo!\n\nDetalhes: ${error.message}\nCódigo: ${error.code || 'Desconhecido'}`);
                     });
             }
         }
@@ -2248,39 +3779,93 @@ async function loadUserDataFromFirebase() {
         }
 
         function openModal(movieId) {
-            const allContent = [...content.filmes, ...content.series, ...content.animes];
-            const movie = allContent.find(m => (m.firebaseKey || m.id) === movieId);
-            if (!movie) return;
+    const allContent = [...content.filmes, ...content.series, ...content.animes];
+    const movie = allContent.find(m => (m.firebaseKey || m.id) === movieId);
+    if (!movie) return;
+    
+    let movieType = 'filmes';
+    if (content.series.find(s => (s.firebaseKey || s.id) === movieId)) movieType = 'series';
+    if (content.animes.find(a => (a.firebaseKey || a.id) === movieId)) movieType = 'animes';
+    
+    const modal = document.getElementById('modal');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const details = document.getElementById('movieDetails');
+    
+    videoPlayer.innerHTML = movie.videoUrl 
+        ? `<iframe id="contentFrame" src="${movie.videoUrl}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`
+        : `<div class="video-placeholder"><span>Adicione a URL do embed do WarezCDN aqui</span></div>`;
+    
+    const progressData = watchingProgress[movieId];
+    const currentProgress = progressData ? Math.round(progressData.progress) : 0;
+    
+    let progressControl = '';
+    
+    if (movieType === 'filmes') {
+        progressControl = `
+            <div class="progress-controls">
+                <h3>⏱️ Marcar Progresso (${currentProgress}%)</h3>
+                <button class="progress-btn ${currentProgress === 25 ? 'active' : ''}" onclick="markProgress(25, '${movieId}')">25%</button>
+                <button class="progress-btn ${currentProgress === 50 ? 'active' : ''}" onclick="markProgress(50, '${movieId}')">50%</button>
+                <button class="progress-btn ${currentProgress === 75 ? 'active' : ''}" onclick="markProgress(75, '${movieId}')">75%</button>
+                <button class="progress-btn ${currentProgress === 100 ? 'active' : ''}" onclick="markProgress(100, '${movieId}')">✓ Concluído</button>
+            </div>
+        `;
+    } else {
+        progressControl = renderEpisodesSection(movieId, movieType);
+    }
+    
+    details.innerHTML = `
+        <h2>${movie.title}</h2>
+        <div class="movie-header">
+            <div class="movie-rating">
+                <div class="stars">${generateStars(movie.rating)}</div>
+                <span>${movie.rating}/10</span>
+            </div>
+            <span>•</span>
+            <span>${movie.duration}</span>
+        </div>
+        <p>${movie.description}</p>
+        <div class="genres">
+            ${movie.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
+        </div>
+        
+        ${progressControl}
+    `;
+    
+    modal.classList.add('active');
+
+    let progressInterval = setInterval(() => {
+        updateWatchingProgress(movieId, movieType);
+    }, 10000);
+
+    const closeHandler = function(e) {
+        if (e.target.id === 'modal' || e.target.classList.contains('close-btn')) {
+            clearInterval(progressInterval);
+            modal.removeEventListener('click', closeHandler);
+        }
+    };
+    
+    modal.addEventListener('click', closeHandler);
+}
+
+        function updateWatchingProgress(itemId, type) {
+            const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+            if (!loggedUser) return;
+
+            const frame = document.getElementById('contentFrame');
+            if (!frame) return;
+
+            const randomProgress = Math.min(95, (watchingProgress[itemId]?.progress || 0) + Math.random() * 5 + 2);
             
-            const modal = document.getElementById('modal');
-            const videoPlayer = document.getElementById('videoPlayer');
-            const details = document.getElementById('movieDetails');
-            
-            videoPlayer.innerHTML = movie.videoUrl 
-                ? `<iframe src="${movie.videoUrl}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`
-                : `<div class="video-placeholder"><span>Adicione a URL do embed do WarezCDN aqui</span></div>`;
-            
-            details.innerHTML = `
-                <h2>${movie.title}</h2>
-                <div class="movie-header">
-                    <div class="movie-rating">
-                        <div class="stars">${generateStars(movie.rating)}</div>
-                        <span>${movie.rating}/10</span>
-                    </div>
-                    <span>•</span>
-                    <span>${movie.duration}</span>
-                </div>
-                <p>${movie.description}</p>
-                <div class="genres">
-                    ${movie.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
-                </div>
-            `;
-            
-            modal.classList.add('active');
+            saveWatchingProgress(itemId, randomProgress, type);
         }
 
         function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+            
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.innerHTML = '<div class="video-placeholder"><span>Carregando vídeo...</span></div>';
         }
 
         function setupAdminPanel() {
@@ -2293,34 +3878,68 @@ async function loadUserDataFromFirebase() {
             const adminLogout = document.getElementById('adminLogoutBtn');
 
             floatBtn.addEventListener('click', () => {
-                if (sessionStorage.getItem('nuarAdminAuth') === 'true') {
+                const adminUser = auth.currentUser;
+                if (adminUser && adminUser.email === 'admin@nuar.com') {
+                    toggleDurationField();
                     contentModal.classList.add('active');
                 } else {
                     loginModal.classList.add('active');
                 }
             });
 
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const email = document.getElementById('adminEmail').value;
                 const password = document.getElementById('adminPassword').value;
                 const errorDiv = document.getElementById('adminError');
+                const loginBtn = document.getElementById('adminLoginBtn');
 
-                if (password === ADMIN_PASSWORD) {
-                    sessionStorage.setItem('nuarAdminAuth', 'true');
-                    loginModal.classList.remove('active');
-                    contentModal.classList.add('active');
-                    document.getElementById('adminPassword').value = '';
-                    errorDiv.style.display = 'none';
-                    showToast('Bem-vindo ao painel admin');
-                    renderMovies();
-                } else {
+                loginBtn.textContent = 'Entrando...';
+                loginBtn.disabled = true;
+                errorDiv.style.display = 'none';
+
+                try {
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    
+                    if (userCredential.user.email === 'admin@nuar.com') {
+                        console.log('✅ Admin autenticado:', userCredential.user.email);
+                        loginModal.classList.remove('active');
+                        contentModal.classList.add('active');
+                        document.getElementById('adminEmail').value = '';
+                        document.getElementById('adminPassword').value = '';
+                        showToast('Bem-vindo ao painel admin');
+                        renderMovies();
+                    } else {
+                        await auth.signOut();
+                        errorDiv.textContent = 'Este usuário não tem permissões de admin!';
+                        errorDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('❌ Erro no login admin:', error);
+                    let errorMessage = 'Credenciais incorretas!';
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'Usuário não encontrado!';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Senha incorreta!';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Email inválido!';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = 'Muitas tentativas! Tente novamente mais tarde.';
+                    }
+                    
+                    errorDiv.textContent = errorMessage;
                     errorDiv.style.display = 'block';
                     document.getElementById('adminPassword').value = '';
+                } finally {
+                    loginBtn.textContent = 'Entrar';
+                    loginBtn.disabled = false;
                 }
             });
 
             cancelLogin.addEventListener('click', () => {
                 loginModal.classList.remove('active');
+                document.getElementById('adminEmail').value = '';
                 document.getElementById('adminPassword').value = '';
                 document.getElementById('adminError').style.display = 'none';
             });
@@ -2330,21 +3949,26 @@ async function loadUserDataFromFirebase() {
                 resetAdminForm();
             });
 
-            adminLogout.addEventListener('click', () => {
-                sessionStorage.removeItem('nuarAdminAuth');
-                contentModal.classList.remove('active');
-                resetAdminForm();
-                showToast('Você saiu do painel admin');
-                renderMovies();
+            adminLogout.addEventListener('click', async () => {
+                try {
+                    await auth.signOut();
+                    contentModal.classList.remove('active');
+                    resetAdminForm();
+                    showToast('Você saiu do painel admin');
+                    renderMovies();
+                    console.log('✅ Admin deslogado');
+                } catch (error) {
+                    console.error('❌ Erro ao fazer logout:', error);
+                    alert('Erro ao sair. Tente novamente.');
+                }
             });
 
             document.querySelectorAll('.admin-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    if (!isEditMode) {
-                        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                        selectedContentType = tab.dataset.type;
-                    }
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    selectedContentType = tab.dataset.type;
+                    toggleDurationField();
                 });
             });
 
@@ -2381,19 +4005,39 @@ async function loadUserDataFromFirebase() {
                 if (isEditMode) {
                     const editId = document.getElementById('editingId').value;
                     const editType = document.getElementById('editingType').value;
-                    const item = content[editType].find(i => (i.firebaseKey || i.id) === editId);
+                    const oldItem = content[editType].find(i => (i.firebaseKey || i.id) === editId);
                     
-                    if (item && item.firebaseKey) {
-                        updateContentInFirebase(editType, item.firebaseKey, itemData)
+                    if (!oldItem || !oldItem.firebaseKey) {
+                        alert('❌ Erro ao encontrar item para editar');
+                        return;
+                    }
+                    
+                    if (editType !== selectedContentType) {
+                        deleteContentFromFirebase(editType, oldItem.firebaseKey)
+                            .then(() => saveContentToFirebase(selectedContentType, itemData))
                             .then(() => {
                                 contentModal.classList.remove('active');
                                 resetAdminForm();
-                                const tipoNome = editType === 'filmes' ? 'Filme' : editType === 'series' ? 'Série' : 'Anime';
+                                const tipoNome = selectedContentType === 'filmes' ? 'Filme' : 
+                                                selectedContentType === 'series' ? 'Série' : 'Anime';
+                                showToast(`Conteúdo movido para ${tipoNome}s com sucesso`);
+                            })
+                            .catch((error) => {
+                                console.error('❌ Erro ao mover:', error);
+                                alert(`Erro: ${error.message}`);
+                            });
+                    } else {
+                        updateContentInFirebase(selectedContentType, oldItem.firebaseKey, itemData)
+                            .then(() => {
+                                contentModal.classList.remove('active');
+                                resetAdminForm();
+                                const tipoNome = selectedContentType === 'filmes' ? 'Filme' : 
+                                                selectedContentType === 'series' ? 'Série' : 'Anime';
                                 showToast(`${tipoNome} "${itemData.title}" atualizado com sucesso`);
                             })
                             .catch((error) => {
-                                console.error('Erro ao atualizar:', error);
-                                alert('Erro ao atualizar conteúdo');
+                                console.error('❌ Erro ao atualizar:', error);
+                                alert(`Erro: ${error.message}`);
                             });
                     }
                 } else {
@@ -2410,12 +4054,31 @@ async function loadUserDataFromFirebase() {
                             showToast(`${tipo} "${itemData.title}" adicionado com sucesso`);
                         })
                         .catch((error) => {
-                            console.error('Erro ao salvar:', error);
-                            alert('Erro ao adicionar conteúdo');
+                            console.error('❌ Erro ao adicionar:', error);
+                            alert(`Erro: ${error.message}`);
                         });
                 }
             });
         }
+
+        function markProgress(percent, itemId) {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) {
+        alert('Você precisa estar logado!');
+        return;
+    }
+
+    saveWatchingProgress(itemId, percent, 'filmes');
+    
+    document.querySelectorAll('.progress-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.progress-btn').classList.add('active');
+    
+    showToast(`Progresso marcado: ${percent}%`);
+    renderMovies();
+    if (percent === 100) {
+        setTimeout(() => checkMovieCompletion(itemId), 500);
+    }
+}
 
         function addGenre() {
             const input = document.getElementById('genreInput');
@@ -2425,6 +4088,29 @@ async function loadUserDataFromFirebase() {
                 adminGenres.push(genre);
                 updateGenresList();
                 input.value = '';
+            }
+        }
+
+        function toggleDurationField() {
+            const durationField = document.getElementById('durationField');
+            const durationInput = document.getElementById('contentDuration');
+            const durationLabel = document.getElementById('durationLabel');
+            
+            if (selectedContentType === 'filmes') {
+                durationField.style.display = 'block';
+                durationLabel.textContent = 'Duração';
+                durationInput.placeholder = 'Ex: 2h 30m';
+                durationInput.required = true;
+            } else if (selectedContentType === 'series') {
+                durationField.style.display = 'block';
+                durationLabel.textContent = 'Temporadas';
+                durationInput.placeholder = 'Ex: 3 temporadas';
+                durationInput.required = true;
+            } else if (selectedContentType === 'animes') {
+                durationField.style.display = 'block';
+                durationLabel.textContent = 'Temporadas';
+                durationInput.placeholder = 'Ex: 2 temporadas';
+                durationInput.required = true;
             }
         }
 
@@ -2443,6 +4129,15 @@ async function loadUserDataFromFirebase() {
             `).join('');
         }
 
+        function getEpisodeCount(itemId, season) {
+    const key = `${itemId}_S${season}`;
+    if (episodesPerSeason[key]) {
+        return episodesPerSeason[key];
+    }
+    // Padrão: 12 episódios para temporadas originais
+    return 12;
+}
+
         function resetAdminForm() {
             isEditMode = false;
             document.getElementById('adminContentForm').reset();
@@ -2459,13 +4154,72 @@ async function loadUserDataFromFirebase() {
                 t.classList.toggle('active', i === 0);
             });
             selectedContentType = 'filmes';
+            toggleDurationField();
         }
 
-        // ===== PASSO 5: ATUALIZAR window.addEventListener =====
+        window.addNewSeason = function(itemId) {
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) {
+        alert('Você precisa estar logado!');
+        return;
+    }
+    
+    if (!customSeasons[itemId]) customSeasons[itemId] = 0;
+    customSeasons[itemId]++;
+    
+    const allContent = [...content.series, ...content.animes];
+    const item = allContent.find(m => (m.firebaseKey || m.id) === itemId);
+    const baseSeasons = parseInt(item.duration.match(/(\d+)\s*temporada/i)?.[1] || 1);
+    const newSeasonNumber = baseSeasons + customSeasons[itemId];
+    
+    // Definir 3 episódios por padrão para nova temporada
+    setEpisodeCount(itemId, newSeasonNumber, 3);
+    
+    saveCustomSeasons();
+    showToast(`Temporada ${newSeasonNumber} adicionada com 3 episódios! 🎉`);
+    
+    // Reabrir o modal
+    openModal(itemId);
+}
+
+window.addEpisodeToSeason = function(event, itemId, season) {
+    event.stopPropagation();
+    
+    const loggedUser = JSON.parse(localStorage.getItem('nuarLoggedUser'));
+    if (!loggedUser) {
+        alert('Você precisa estar logado!');
+        return;
+    }
+    
+    const currentCount = getEpisodeCount(itemId, season);
+    setEpisodeCount(itemId, season, currentCount + 1);
+    
+    // Atualizar o grid de episódios
+    const episodesGrid = document.getElementById('episodesGrid');
+    if (episodesGrid) {
+        episodesGrid.innerHTML = renderEpisodes(season, itemId);
+    }
+    
+    showToast(`Episódio ${currentCount + 1} adicionado! ✓`);
+}
+
+window.scrollSeasons = function(direction, itemId) {
+    const selector = document.getElementById(`seasonSelector_${itemId}`);
+    if (!selector) return;
+    
+    const scrollAmount = 150;
+    if (direction === 'left') {
+        selector.scrollLeft -= scrollAmount;
+    } else {
+        selector.scrollLeft += scrollAmount;
+    }
+}
+
         window.addEventListener('load', async () => {
-    console.log('🚀 Aplicação iniciada');
-    console.log('🔐 Verificando autenticação...');
+            console.log('🚀 Aplicação iniciada');
+            console.log('🔐 Verificando autenticação...');
             await checkAuthState();
+            await syncLocalStorageWithFirebase();
             
             updateAuthArea();
             setupModal();
