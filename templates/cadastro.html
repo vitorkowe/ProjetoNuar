@@ -220,13 +220,14 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                await addDoc(collection(db, 'users'), {
-                    uid: user.uid,
+                // Salvar dados no localStorage (sem precisar do Firestore)
+                localStorage.setItem('nuarLoggedUser', JSON.stringify({
+                    nome: username,
                     username: username,
                     email: email,
-                    createdAt: new Date(),
+                    uid: user.uid,
                     avatar: null
-                });
+                }));
                 
                 showError(registerError, `✓ Bem-vindo, ${username}!`, true);
                 setTimeout(() => window.location.href = '/inicio.html', 1500);
