@@ -2146,6 +2146,16 @@ body {
     </style>
 </head>
 <body>
+
+    <script>
+        // Verificar se usuário está logado
+        const loggedUser = localStorage.getItem('nuarLoggedUser');
+        if (!loggedUser) {
+            // Se não estiver logado, redireciona para a landing page
+            window.location.href = 'index.html';
+        }
+    </script>
+
     <div class="header">
         <div class="header-top">
             <div class="header-left">
